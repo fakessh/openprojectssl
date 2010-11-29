@@ -1,4 +1,5 @@
 #include "common.h"
+#include "client.h"
 
 BIO *bio_err=0;
 static char *pass;

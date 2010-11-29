@@ -19,10 +19,10 @@
 #include <openssl/err.h>
 
 //#define CA_LIST "root.pem"
-#define CA_LIST "cacert.pem"
+#define CA_LIST "root.pem"
 #define ServerHOST	"localhost"
 #define ClientHOST	"localhost"
-#define RANDOM  "/dev/urandom"
+#define RANDOM  "cacert.pem"
 #define ServerPORT	1080
 #define BUFSIZZ 1024
 
