@@ -6,6 +6,7 @@
 */
 void read_write (ssl, sock)
   SSL *ssl;
+  int sock;
   {
 
         int r,  c2sl=0;
