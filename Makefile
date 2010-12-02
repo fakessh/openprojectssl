@@ -6,7 +6,7 @@
 
 PATHSYSINCL := /usr/include
 PATHSSLLIB := /usr/lib
-SSLLIBS := -lssl -lcrypto -pthread 
+SSLLIBS := -lssl -lcrypto -pthread -pedantic
 CC := gcc
 CFLAGS := -g
 CLIENTBINHTTP := sslclienthttp
