@@ -6,9 +6,7 @@
 
 static int s_server_session_id_context = 1;
 
-int main(argc,argv)
-int argc;
-char **argv;
+int main(int argc,char **argv)
 {
    int sock,s;
    BIO *sbio;

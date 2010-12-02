@@ -7,16 +7,14 @@ static int password_cb(char *buf,int num,int rwflag,void *userdata);
 static void sigpipe_handle(int x);
 
 /* A simple error and exit routine*/
-int err_exit(string)
-  char *string;
+int err_exit(char *string)
   {
     fprintf(stderr,"%s\n",string);
     exit(0);
   }
 
 /* Print SSL errors and exit*/
-int berr_exit(string)
-  char *string;
+int berr_exit(char *string)
   {
     BIO_printf(bio_err,"%s\n",string);
     ERR_print_errors(bio_err);
@@ -36,9 +34,7 @@ static int password_cb(char *buf,int num,int rwflag,void *userdata)
 static void sigpipe_handle(int x){
 }
 
-SSL_CTX *initialize_ctx(keyfile,password)
-  char *keyfile;
-  char *password;
+SSL_CTX *initialize_ctx(char *keyfile,char *password)
   {
     SSL_METHOD *meth;
     SSL_CTX *ctx;
@@ -82,8 +78,7 @@ SSL_CTX *initialize_ctx(keyfile,password)
     return ctx;
   }
 
-void destroy_ctx(ctx)
-  SSL_CTX *ctx;
+void destroy_ctx(SSL_CTX *ctx)
   {
     SSL_CTX_free(ctx);
   }
@@ -111,9 +106,7 @@ int verify_callback(int ok, X509_STORE_CTX *store)
 }
 
 /* Check that the common name matches the host name*/
-void check_cert_chain(ssl,host)
-  SSL *ssl;
-  char *host;
+void check_cert_chain(SSL *ssl,char *host)
   {
 
     X509 *peer;

@@ -7,9 +7,7 @@
 #include "client.h"
 #include "read_write.h"
 
-int main(argc,argv)
-  int argc;
-  char **argv;
+int main(int argc,char **argv)
   {
     SSL_CTX *ctx;
     SSL *ssl;

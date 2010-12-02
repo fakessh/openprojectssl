@@ -4,9 +4,7 @@
    Read from the server and write to the keyboard
 
 */
-void read_write (ssl, sock)
-  SSL *ssl;
-  int sock;
+void read_write (SSL *ssl, int sock);
   {
 
         int r,  c2sl=0;

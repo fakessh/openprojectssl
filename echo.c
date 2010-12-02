@@ -1,7 +1,6 @@
 #include "common.h"
 
-void echo(ssl)
-  SSL *ssl;
+void echo(SSL *ssl)
   {
     char buf[BUFSIZZ];
     int r,len,offset;
