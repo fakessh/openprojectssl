@@ -15,6 +15,8 @@ int tcp_connect()
 
     if((sock=socket(AF_INET,SOCK_STREAM,IPPROTO_TCP))<0)
       err_exit("Couldn't create socket");
+    if(bind(sock,(struct sockaddr*)&addr,sizeof(addr))<0)
+      err_exit("Couldn't create bind");
     if(connect(sock,(struct sockaddr *)&addr,sizeof(addr))<0)
       err_exit("Couldn't connect socket");
     
