@@ -8,15 +8,13 @@ int tcp_connect()
     
     if(!(hp=gethostbyname(ServerHOST)))
       berr_exit("Couldn't resolve host");
-    memset(&addr,0,sizeof(addr));
-    addr.sin_addr=*(struct in_addr*)hp->h_addr_list[0];
+    bzero(&addr,sizeof(addr));
+    addr.sin_addr.s_addr = *(long*)(hp->h_addr);
     addr.sin_family=AF_INET;
     addr.sin_port=htons(ServerPORT);
 
     if((sock=socket(AF_INET,SOCK_STREAM,IPPROTO_TCP))<0)
       err_exit("Couldn't create socket");
-    if(bind(sock,(struct sockaddr*)&addr,sizeof(addr))<0)
-      err_exit("Couldn't create bind");
     if(connect(sock,(struct sockaddr *)&addr,sizeof(addr))<0)
       err_exit("Couldn't connect socket");
     
