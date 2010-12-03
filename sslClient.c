@@ -15,7 +15,6 @@ int main(int argc,char **argv)
     int sock;
 
     /* Build our SSL context*/
-    ssl = SSL_new(ctx);
     ctx=initialize_ctx(ClientKEYFILE,ClientPASSWORD);
 
     /* Connect the TCP socket*/
@@ -23,6 +22,7 @@ int main(int argc,char **argv)
 
     /* Connect the SSL socket */
     ssl=SSL_new(ctx);
+    SSL_set_fd(ssl,sock);
     sbio=BIO_new_socket(sock,BIO_NOCLOSE);
     SSL_set_bio(ssl,sbio,sbio);
     if(SSL_connect(ssl)<=0)
