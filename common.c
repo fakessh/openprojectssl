@@ -67,6 +67,9 @@ SSL_CTX *initialize_ctx(char *keyfile,char *password)
     /* Load the CAs we trust*/
     if(!(SSL_CTX_load_verify_locations(ctx,CA_LIST,0)))
       berr_exit("Couldn't read CA list");
+    if (!(SSL_CTX_check_private_key(ctx)))
+      berr_exit("Private key does match the public certificate");
+     
     SSL_CTX_set_verify_depth(ctx,1);
     SSL_CTX_set_verify(ctx,
       SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT, verify_callback);
