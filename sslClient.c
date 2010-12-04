@@ -24,7 +24,7 @@ int main(int argc,char **argv)
     ssl=SSL_new(ctx);
     SSL_set_fd(ssl,sock);
     sbio=BIO_new_socket(sock,BIO_NOCLOSE);
-    SSL_set_bio(ssl,sbio,sbio);
+    /*SSL_set_bio(ssl,sbio,sbio);*/
     if(SSL_connect(ssl)<=0)
       berr_exit("SSL connect error");
     check_cert_chain(ssl,ServerHOST);

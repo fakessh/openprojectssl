@@ -4,10 +4,15 @@
    Read from the server and write to the keyboard
 
 */
+
+extern BIO *SSL_get_rbio();
+extern BIO *SSL_get_wbio();
 void read_write (SSL *ssl, int sock)
   {
 
         int r,  c2sl=0;
+/*        BIO *SSL_get_rbio(ssl);*/
+/*        BIO *SSL_get_wbio(ssl);*/
 
         /*int shutdown_wait=0;*/
         char c2s[BUFSIZZ], s2c[BUFSIZZ];
@@ -15,10 +20,12 @@ void read_write (SSL *ssl, int sock)
         while(1){
 
             /* Check for input on the console*/
-            c2sl = read(0, c2s, BUFSIZZ);
+	    BIO *SSL_get_rbio();
+            c2sl = SSL_read(0, c2s, BUFSIZZ);
             if(c2sl==0)  goto end;
 
             /* If we've got data to write then try to write it*/
+	  BIO *SSL_get_wbio();
           SSL_write(ssl, c2s, c2sl);
 
            /* Now check if there's data to read */
