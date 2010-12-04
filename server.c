@@ -23,9 +23,7 @@ int tcp_listen()
     return(sock);
   }
 
-void load_dh_params(ctx,file)
-  SSL_CTX *ctx;
-  char *file;
+void load_dh_params(SSL_CTX *ctx,char *file)
   {
     DH *ret=0;
     BIO *bio;
@@ -39,8 +37,7 @@ void load_dh_params(ctx,file)
       berr_exit("Couldn't set DH parameters");
   }
 
-void generate_eph_rsa_key(ctx)
-  SSL_CTX *ctx;
+void generate_eph_rsa_key(SSL_CTX *ctx)
   {
     RSA *rsa;
 
