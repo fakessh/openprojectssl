@@ -1,6 +1,6 @@
 #include "commonclient.h"
 #include "client.h"
-
+#include "common.h"
 int tcp_connect()
  {
     struct hostent *hp;
