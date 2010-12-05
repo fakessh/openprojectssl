@@ -3,15 +3,18 @@
 
 // Simple structure to keep track of the handle, and
 // of what needs to be freed later.
-typedef struct {
-    int socket;
-    SSL *sslHandle;
-    SSL_CTX *sslContext;
-} connection;
 
 // For this example, we'll be testing on openssl.org
 #define SERVER  "127.0.0.1"
 #define PORT 1080
+typedef struct {
+    int socket;
+    SSL *sslHandle;
+    SSL_CTX *sslContext;
+    } connection;
+
+connection *c;
+
 char *keyfile = "mycert.pem";
 char *password = "";
 
@@ -105,21 +108,17 @@ int tcpConnect ()
 }
 
 // Establish a connection using an SSL layer
-connection *sslConnect (void)
+int *sslConnect (connection *c)
 {
-  connection *c;
-  /*typedef struct {
-    int socket;
-    SSL *sslHandle;
-    SSL_CTX *sslContext;
-    } connection;*/
+  connection *fd;
 
-  c = malloc (sizeof (connection));
-  c->sslHandle = NULL;
-  c->sslContext = NULL;
 
-  c->socket = tcpConnect ();
-  if (c->socket)
+  fd = malloc (sizeof (connection));
+  fd->sslHandle = NULL;
+  fd->sslContext = NULL;
+
+  fd->socket = tcpConnect ();
+  if (fd->socket)
     {
       // Register the error strings for libcrypto & libssl
       SSL_load_error_strings ();
@@ -127,26 +126,26 @@ connection *sslConnect (void)
       SSL_library_init ();
 
       // New context saying we are a client, and using SSL 2 or 3
-      c->sslContext = SSL_CTX_new (SSLv23_client_method ());
-      if (c->sslContext == NULL)
+      fd->sslContext = SSL_CTX_new (SSLv23_client_method ());
+      if (fd->sslContext == NULL)
         ERR_print_errors_fp (stderr);
     /* Load our keys and certificates*/
-    if(!(SSL_CTX_use_certificate_file(c->sslContext,keyfile,SSL_FILETYPE_PEM)))
+    if(!(SSL_CTX_use_certificate_file(fd->sslContext,keyfile,SSL_FILETYPE_PEM)))
       berr_exit("Couldn't read certificate file");
 
     pass=password;
-    SSL_CTX_set_default_passwd_cb(c->sslContext,password_cb);
-    if(!(SSL_CTX_use_PrivateKey_file(c->sslContext,keyfile,SSL_FILETYPE_PEM)))
+    SSL_CTX_set_default_passwd_cb(fd->sslContext,password_cb);
+    if(!(SSL_CTX_use_PrivateKey_file(fd->sslContext,keyfile,SSL_FILETYPE_PEM)))
       berr_exit("Couldn't read key file");
 
     /* Load the CAs we trust*/
-    if(!(SSL_CTX_load_verify_locations(c->sslContext,CA_LIST,0)))
+    if(!(SSL_CTX_load_verify_locations(fd->sslContext,CA_LIST,0)))
       berr_exit("Couldn't read CA list");
-    if (!(SSL_CTX_check_private_key(c->sslContext)))
+    if (!(SSL_CTX_check_private_key(fd->sslContext)))
       berr_exit("Private key does match the public certificate");
      
-    SSL_CTX_set_verify_depth(c->sslContext,1);
-    SSL_CTX_set_verify(c->sslContext,
+    SSL_CTX_set_verify_depth(fd->sslContext,1);
+    SSL_CTX_set_verify(fd->sslContext,
       SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT, verify_callback);
 
     /* Load randomness */
@@ -155,16 +154,16 @@ connection *sslConnect (void)
 
 
       // Create an SSL struct for the connection
-      c->sslHandle = SSL_new (c->sslContext);
-      if (c->sslHandle == NULL)
+      fd->sslHandle = SSL_new (fd->sslContext);
+      if (fd->sslHandle == NULL)
         ERR_print_errors_fp (stderr);
 
       // Connect the SSL struct to our connection
-      if (!SSL_set_fd (c->sslHandle, c->socket))
+      if (!SSL_set_fd (fd->sslHandle, c->socket))
         ERR_print_errors_fp (stderr);
 
       // Initiate SSL handshake
-      if (SSL_connect (c->sslHandle) != 1)
+      if (SSL_connect (fd->sslHandle) != 1)
         ERR_print_errors_fp (stderr);
     }
   else
@@ -172,7 +171,7 @@ connection *sslConnect (void)
       perror ("Connect failed");
     }
 
-  return c;
+  return fd;
 }
 
 // Disconnect & free connection struct

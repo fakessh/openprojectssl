@@ -5,28 +5,26 @@
 */
 /*#include "common.h"*/
 #include "commonclient.h"
-#include "read_write.h"
-
+#include "read_writecommon.h"
 
 // Simple structure to keep track of the handle, and
 // // of what needs to be freed later.
+             
 typedef struct {
-     int socket;
-     SSL *sslHandle;
-     SSL_CTX *sslContext;
-} connection;
+                int socket;
+                SSL *sslHandle;
+                SSL_CTX *sslContext;
+                       } connection;
+        
 connection *c;
-int sock;             
-
-
+int sock;
 int main(int argc,char *argv[])
   {
     /*BIO *sbio;*/
-      /*int sock;*/
-    connection *c;
+    /*connection *c;*/
     /* Build our SSL context*/
     /*c->sslContext=initialize_ctx(ClientKEYFILE,ClientPASSWORD);*/
-    sock = sslConnect ();
+    sock  = sslConnect();
     /* Connect the TCP socket*/
     /*c->socket=tcp_connect();*/
 

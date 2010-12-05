@@ -9,13 +9,15 @@ void read_write (SSL *ssl,int sock)
   {
 
         int r,  c2sl=0;
-        typedef struct {
-                int socket;
-                SSL *sslHandle;
-                SSL_CTX *sslContext;
-                       } connection;
+    typedef struct {
+             int socket;
+             SSL *sslHandle;
+             SSL_CTX *sslContext;
+                 } connection;
         
-	connection *c;
+
+	 connection *c;
+
 
         /*int shutdown_wait=0;*/
         char c2s[BUFSIZZ], s2c[BUFSIZZ];

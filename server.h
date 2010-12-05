@@ -1,8 +1,8 @@
 #ifndef _server_h
 #define _server_h
 
-#define ServerKEYFILE "privkey.pem"
-#define ServerPASSWORD "cairo"
+#define ServerKEYFILE "mycert.pem"
+#define ServerPASSWORD ""
 #define DHFILE "dh1024.pem"
 
 int tcp_listen(void);
