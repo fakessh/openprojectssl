@@ -15,17 +15,18 @@ typedef struct {
      SSL *sslHandle;
      SSL_CTX *sslContext;
 } connection;
-             
+connection *c;
+int sock;             
 
 
-int main(int argc,char **argv)
+int main(int argc,char *argv[])
   {
     /*BIO *sbio;*/
       /*int sock;*/
     connection *c;
     /* Build our SSL context*/
     /*c->sslContext=initialize_ctx(ClientKEYFILE,ClientPASSWORD);*/
-    c = sslConnect ();
+    sock = sslConnect ();
     /* Connect the TCP socket*/
     /*c->socket=tcp_connect();*/
 
@@ -47,5 +48,6 @@ int main(int argc,char **argv)
     read_write(c->sslContext,c->socket);
 
     destroy_ctx(c->sslContext);
+    return 0;
   }
 
