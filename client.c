@@ -1,4 +1,5 @@
-#include "common.h"
+#include "commonclient.h"
+#include "client.h"
 
 int tcp_connect()
  {
