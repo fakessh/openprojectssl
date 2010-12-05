@@ -1,4 +1,11 @@
 openproject openssl client server c
 
+
+openssl dhparam -check -text -5 1024 -out dh1024.pem
+openssl req   -x509 -nodes -days 365   -newkey rsa:1024 -keyout mycert.pem
+-out mycert.pem
+
+
+
 author : "fakessh @ <fakessh@fakessh.eu>" "g A b R i E L <lie.in.our.days@gmail.com>"
 
