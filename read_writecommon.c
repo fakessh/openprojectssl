@@ -5,18 +5,10 @@
 
 */
 
-void read_write (SSL *ssl,int sock)
+void read_write_common (SSL *ssl,int sock)
   {
 
         int r,  c2sl=0;
-    typedef struct {
-             int socket;
-             SSL *sslHandle;
-             SSL_CTX *sslContext;
-                 } connection;
-        
-
-	 connection *c;
 
 
         /*int shutdown_wait=0;*/
@@ -25,17 +17,17 @@ void read_write (SSL *ssl,int sock)
         while(1){
 
             /* Check for input on the console*/
-            c2sl = SSL_read(c->sslHandle, c2s, BUFSIZZ);
+            c2sl = SSL_read(ssl, c2s, BUFSIZZ);
             if(c2sl==0)  goto end;
 
             /* If we've got data to write then try to write it*/
-          SSL_write(c->sslHandle, c2s, c2sl);
+          SSL_write(ssl, c2s, c2sl);
 
            /* Now check if there's data to read */
            do {
-            r = SSL_read(c->sslHandle, s2c, BUFSIZZ);
+            r = SSL_read(ssl, s2c, BUFSIZZ);
 
-              switch(SSL_get_error(c->sslHandle,r)){
+              switch(SSL_get_error(ssl,r)){
 
                     case SSL_ERROR_NONE:
                       fwrite(s2c,1,r,stdout);
@@ -48,13 +40,13 @@ void read_write (SSL *ssl,int sock)
                            berr_exit("SSL read problem");
            }
 
-            } while (SSL_pending(c->sslHandle));
+            } while (SSL_pending(ssl));
 
           }/* end of while  (1) */
       end:
-        SSL_shutdown(c->sslHandle);
-        SSL_free(c->sslHandle);
-        close(c->socket);
+        SSL_shutdown(ssl);
+        SSL_free(ssl);
+        close(sock);
         return;
 
  }

@@ -229,3 +229,33 @@ void sslWrite (connection *c, char *text)
   if (c)
     SSL_write (c->sslHandle, text, strlen (text));
 }
+
+
+/* Check that the common name matches the host name*/
+void check_cert_chain(SSL *ssl,char *host)
+  {
+
+    X509 *peer;
+    char  peer_CN[256];
+
+    /*int i;*/
+
+    printf("check certificate was called with  host= %s\n",host);
+    if(SSL_get_verify_result(ssl)!=X509_V_OK)
+      berr_exit("Certificate doesn't verify");
+
+    /*Check the cert chain. The chain length
+      is automatically checked by OpenSSL when we
+      set the verify depth in the ctx */
+
+    /*Check the common name*/
+    peer=SSL_get_peer_certificate(ssl);
+    X509_NAME_get_text_by_NID(X509_get_subject_name(peer),
+      NID_commonName, peer_CN, 256);
+    printf("Peer CN=%s  & host= %s\n",peer_CN,host);
+    printf("strcasecmp(%s,%s)=%d\n",peer_CN,host,strcasecmp(peer_CN,host));
+
+
+    if(strcasecmp(peer_CN,host))
+    	err_exit("Common name doesn't match host name");
+  }
