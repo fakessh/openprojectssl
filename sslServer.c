@@ -4,9 +4,8 @@
 #include "echo.h"
 #define SA      struct sockaddr
 
-static int s_server_session_id_context = 1;
 
-int main(int argc,char **argv)
+int main(int argc,char *argv[])
 {
    int sock,s;
    BIO *sbio;
@@ -18,14 +17,13 @@ int main(int argc,char **argv)
    struct  hostent *hp, *gethostbyname();
    char *clientHostName;
 
-
+   SSL_library_init();
    /* Build our SSL context*/
-   ctx=initialize_ctx(ServerKEYFILE,ServerPASSWORD);
+   ctx=InitServerCTX();
+   LoadCertificates(ctx, "mycert.pem", "mycert.pem");
    load_dh_params(ctx,DHFILE);
    generate_eph_rsa_key(ctx);
 
-   SSL_CTX_set_session_id_context(ctx,(void*)&s_server_session_id_context,
-       sizeof s_server_session_id_context);
 
    sock=tcp_listen();
 
@@ -43,25 +41,19 @@ int main(int argc,char **argv)
          clientHostName = hp->h_name;
          printf("(Name is : %s)\n", clientHostName);
       }
+      ssl = SSL_new(ctx) ;
+      SSL_set_fd ( ssl,sock );
+      Servlet(ssl);
       if (!strcmp(clientHostName, ClientHOST) == 0) {
          printf ("WARNING, clinet coming from non-expected host\n");
-         close (s);
       } else {
          printf("client coming  from expected host\n");
 
 
-
-
-         sbio=BIO_new_socket(s,BIO_NOCLOSE);
-         ssl=SSL_new(ctx);
-         SSL_set_bio(ssl,sbio,sbio);
-
-         if((r=SSL_accept(ssl)<=0))
-            berr_exit("SSL accept error");
-         check_cert_chain(ssl,ClientHOST);
-
          if (fork() == 0)
             echo(ssl);
       }
+      close(sock);
+      SSL_CTX_free(ctx);
    }
 }

@@ -56,12 +56,12 @@ SSL_CTX *initialize_ctx(char *keyfile,char *password)
     ctx=SSL_CTX_new(meth);
 
     /* Load our keys and certificates*/
-    if(!(SSL_CTX_use_certificate_file(ctx,keyfile,SSL_FILETYPE_PEM)))
+    if(!(SSL_CTX_use_certificate_file(ctx,ClientKEYFILE,SSL_FILETYPE_PEM)))
       berr_exit("Couldn't read certificate file");
 
     pass=password;
     SSL_CTX_set_default_passwd_cb(ctx,password_cb);
-    if(!(SSL_CTX_use_PrivateKey_file(ctx,keyfile,SSL_FILETYPE_PEM)))
+    if(!(SSL_CTX_use_PrivateKey_file(ctx,ClientKEYFILE,SSL_FILETYPE_PEM)))
       berr_exit("Couldn't read key file");
 
     /* Load the CAs we trust*/

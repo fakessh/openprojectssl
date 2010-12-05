@@ -25,7 +25,7 @@
 #define RANDOM  "mycert.pem"
 #define ServerPORT	1080
 #define BUFSIZZ 1024
-
+#define ClientKEYFILE "mycert.pem"
 extern BIO *bio_err;
 int berr_exit (char *string);
 int err_exit(char *string);

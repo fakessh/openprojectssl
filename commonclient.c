@@ -124,18 +124,18 @@ int *sslConnect (connection *c)
       SSL_load_error_strings ();
       // Register the available ciphers and digests
       SSL_library_init ();
-
+      OpenSSL_add_all_ciphers();
       // New context saying we are a client, and using SSL 2 or 3
       fd->sslContext = SSL_CTX_new (SSLv23_client_method ());
       if (fd->sslContext == NULL)
         ERR_print_errors_fp (stderr);
     /* Load our keys and certificates*/
-    if(!(SSL_CTX_use_certificate_file(fd->sslContext,keyfile,SSL_FILETYPE_PEM)))
+    if(!(SSL_CTX_use_certificate_file(fd->sslContext,ClientKEYFILE,SSL_FILETYPE_PEM)))
       berr_exit("Couldn't read certificate file");
 
     pass=password;
     SSL_CTX_set_default_passwd_cb(fd->sslContext,password_cb);
-    if(!(SSL_CTX_use_PrivateKey_file(fd->sslContext,keyfile,SSL_FILETYPE_PEM)))
+    if(!(SSL_CTX_use_PrivateKey_file(fd->sslContext,ClientKEYFILE,SSL_FILETYPE_PEM)))
       berr_exit("Couldn't read key file");
 
     /* Load the CAs we trust*/
@@ -151,20 +151,6 @@ int *sslConnect (connection *c)
     /* Load randomness */
     if(!(RAND_load_file(RANDOM,1024*1024)))
       berr_exit("Couldn't load randomness");
-
-
-      // Create an SSL struct for the connection
-      fd->sslHandle = SSL_new (fd->sslContext);
-      if (fd->sslHandle == NULL)
-        ERR_print_errors_fp (stderr);
-
-      // Connect the SSL struct to our connection
-      if (!SSL_set_fd (fd->sslHandle, c->socket))
-        ERR_print_errors_fp (stderr);
-
-      // Initiate SSL handshake
-      if (SSL_connect (fd->sslHandle) != 1)
-        ERR_print_errors_fp (stderr);
     }
   else
     {
