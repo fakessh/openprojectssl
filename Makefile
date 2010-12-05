@@ -13,7 +13,7 @@ CLIENTBINHTTP := sslclienthttp
 CLIENTBIN := sslclient
 SERVERBIN := sslserver
 
-
+all: sslserver sslclient
 
 sslserver: sslServer.o server.o echo.o common.o
 	$(CC) $^ -o $(SERVERBIN) -L$(PATHSSLLIB) $(SSLLIBS)
