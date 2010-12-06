@@ -108,7 +108,7 @@ int tcpConnect ()
 }
 
 // Establish a connection using an SSL layer
-int *sslConnect (connection *c)
+int sslConnect (connection *c)
 {
   connection *fd;
 
@@ -157,7 +157,7 @@ int *sslConnect (connection *c)
       perror ("Connect failed");
     }
 
-  return fd;
+  return (int)fd;
 }
 
 // Disconnect & free connection struct
