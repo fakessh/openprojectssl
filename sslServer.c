@@ -13,7 +13,7 @@ int main(int argc,char *argv[])
    SSL *ssl;
    int r;
    struct sockaddr_in from;
-   int fromlen;
+   socklen_t fromlen;
    struct  hostent *hp, *gethostbyname();
    char *clientHostName;
 
@@ -30,7 +30,7 @@ int main(int argc,char *argv[])
    fromlen = sizeof(from);
 
    while(1){
-      if((s=accept(sock,(SA *)&from,&fromlen))<0)
+      if((s=accept(sock,(SA *)&from,(socklen_t *)fromlen))<0)
          err_exit("Problem accepting");
       printf("Serving %s:%d\n", inet_ntoa(from.sin_addr),
           ntohs(from.sin_port));
