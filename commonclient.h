@@ -25,13 +25,13 @@
 #define RANDOM  "mycert.pem"
 #define ServerPORT	1080
 #define BUFSIZZ 1024
+
 extern BIO *bio_err;
 int berr_exit (char *string);
 int err_exit(char *string);
-int RAND_load_file(const char *filename,long max_bytes);
-void ERR_print_errors(BIO *bp);
-SSL_CTX *initialize_ctx(char *keyfile, char *password);
-void destroy_ctx(SSL_CTX *ctx);
+int OpenConnection(const char *hostname, int port);
+SSL_CTX* InitCTX(void);
+void ShowCerts(SSL* ssl);
 char * inet_ntoa ( struct in_addr in );
 #endif
 
@@ -41,6 +41,3 @@ char * inet_ntoa ( struct in_addr in );
                                                       (entry), (arg))
 void THREAD_CC server_thread(void *arg);
 
-int verify_callback(int ok, X509_STORE_CTX *store);
-
-void check_cert_chain(SSL *ssl,char *host);

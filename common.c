@@ -1,140 +1,110 @@
 #include "common.h"
-#include "client.h"
 
-BIO *bio_err=0;
-static char *pass;
-static int password_cb(char *buf,int num,int rwflag,void *userdata);
-static void sigpipe_handle(int x);
+#define FAIL    -1
 
-/* A simple error and exit routine*/
-int err_exit(char *string)
-  {
-    fprintf(stderr,"%s\n",string);
-    exit(0);
-  }
+int OpenListener(int port)
+{   int sd;
+    struct sockaddr_in addr;
 
-/* Print SSL errors and exit*/
-int berr_exit(char *string)
-  {
-    BIO_printf(bio_err,"%s\n",string);
-    ERR_print_errors(bio_err);
-    exit(0);
-  }
-
-/*The password code is not thread safe*/
-static int password_cb(char *buf,int num,int rwflag,void *userdata)
-  {
-    if(num<strlen(pass)+1)
-      return(0);
-
-    strcpy(buf,pass);
-    return(strlen(pass));
-  }
-
-static void sigpipe_handle(int x){
+    sd = socket(PF_INET, SOCK_STREAM, 0);
+    bzero(&addr, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(port);
+    addr.sin_addr.s_addr = INADDR_ANY;
+    if ( bind(sd, (struct sockaddr*)&addr, sizeof(addr)) != 0 )
+    {
+        perror("can't bind port");
+        abort();
+    }
+    if ( listen(sd, 10) != 0 )
+    {
+        perror("Can't configure listening port");
+        abort();
+    }
+    return sd;
 }
 
-SSL_CTX *initialize_ctx(char *keyfile,char *password)
-  {
-    SSL_METHOD *meth;
+SSL_CTX* InitServerCTX(void)
+{   SSL_METHOD *method;
     SSL_CTX *ctx;
 
-    if(!bio_err){
-      /* Global system initialization*/
-      SSL_library_init();
-      SSL_load_error_strings();
-
-      /* An error write context */
-      bio_err=BIO_new_fp(stderr,BIO_NOCLOSE);
-    }
-
-    /* Set up a SIGPIPE handler */
-    signal(SIGPIPE,sigpipe_handle);
-
-    /* Create our context*/
-    meth=SSLv3_method();
-    ctx=SSL_CTX_new(meth);
-
-    /* Load our keys and certificates*/
-    if(!(SSL_CTX_use_certificate_file(ctx,ClientKEYFILE,SSL_FILETYPE_PEM)))
-      berr_exit("Couldn't read certificate file");
-
-    pass=password;
-    SSL_CTX_set_default_passwd_cb(ctx,password_cb);
-    if(!(SSL_CTX_use_PrivateKey_file(ctx,ClientKEYFILE,SSL_FILETYPE_PEM)))
-      berr_exit("Couldn't read key file");
-
-    /* Load the CAs we trust*/
-    if(!(SSL_CTX_load_verify_locations(ctx,CA_LIST,0)))
-      berr_exit("Couldn't read CA list");
-    if (!(SSL_CTX_check_private_key(ctx)))
-      berr_exit("Private key does match the public certificate");
-     
-    SSL_CTX_set_verify_depth(ctx,1);
-    SSL_CTX_set_verify(ctx,
-      SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT, verify_callback);
-
-    /* Load randomness */
-    if(!(RAND_load_file(RANDOM,1024*1024)))
-      berr_exit("Couldn't load randomness");
-
-    return ctx;
-  }
-
-void destroy_ctx(SSL_CTX *ctx)
-  {
-    SSL_CTX_free(ctx);
-  }
-
-int verify_callback(int ok, X509_STORE_CTX *store)
-{
-    char data[256];
-    if (ok)
+    OpenSSL_add_all_algorithms();  /* load & register all cryptos, etc. */
+    SSL_load_error_strings();   /* load all error messages */
+    method = SSLv2_server_method();  /* create new server-method instance */
+    ctx = SSL_CTX_new(method);   /* create new context from method */
+    if ( ctx == NULL )
     {
-        fprintf(stderr, "verify_callback\n");
-        X509 *cert = X509_STORE_CTX_get_current_cert(store);
-        int  depth = X509_STORE_CTX_get_error_depth(store);
-        int  err = X509_STORE_CTX_get_error(store);
-
-        fprintf(stderr, "certificate at depth: %i\n", depth);
-        X509_NAME_oneline(X509_get_issuer_name(cert), data, 256);
-        fprintf(stderr, "issuer = %s\n", data);
-        X509_NAME_oneline(X509_get_subject_name(cert), data, 256);
-        fprintf(stderr, "subject = %s\n", data);
-        fprintf(stderr, "error status:  %i:%s\n", err, X509_verify_cert_error_string(err)
-);
+        ERR_print_errors_fp(stderr);
+        abort();
     }
-
-    return ok;
+    return ctx;
 }
 
-/* Check that the common name matches the host name*/
-void check_cert_chain(SSL *ssl,char *host)
-  {
+void LoadCertificates(SSL_CTX* ctx, char* CertFile, char* KeyFile)
+{
+ /* set the local certificate from CertFile */
+    if ( SSL_CTX_use_certificate_file(ctx, CertFile, SSL_FILETYPE_PEM) <= 0 )
+    {
+        ERR_print_errors_fp(stderr);
+        abort();
+    }
+    /* set the private key from KeyFile (may be the same as CertFile) */
+    if ( SSL_CTX_use_PrivateKey_file(ctx, KeyFile, SSL_FILETYPE_PEM) <= 0 )
+    {
+        ERR_print_errors_fp(stderr);
+        abort();
+    }
+    /* verify private key */
+    if ( !SSL_CTX_check_private_key(ctx) )
+    {
+        fprintf(stderr, "Private key does not match the public certificate\n");
+        abort();
+    }
+}
 
-    X509 *peer;
-    char  peer_CN[256];
+void ShowCerts(SSL* ssl)
+{   X509 *cert;
+    char *line;
 
-    /*int i;*/
+    cert = SSL_get_peer_certificate(ssl); /* Get certificates (if available) */
+    if ( cert != NULL )
+    {
+        printf("Server certificates:\n");
+        line = X509_NAME_oneline(X509_get_subject_name(cert), 0, 0);
+        printf("Subject: %s\n", line);
+        free(line);
+        line = X509_NAME_oneline(X509_get_issuer_name(cert), 0, 0);
+        printf("Issuer: %s\n", line);
+        free(line);
+        X509_free(cert);
+    }
+    else
+        printf("No certificates.\n");
+}
 
-    printf("check certificate was called with  host= %s\n",host);
-    if(SSL_get_verify_result(ssl)!=X509_V_OK)
-      berr_exit("Certificate doesn't verify");
+void Servlet(SSL* ssl) /* Serve the connection -- threadable */
+{   char buf[1024];
+    char reply[1024];
+    int sd, bytes;
+    const char* HTMLecho="<html><body><pre>%s</pre></body></html>\n\n";
 
-    /*Check the cert chain. The chain length
-      is automatically checked by OpenSSL when we
-      set the verify depth in the ctx */
-
-    /*Check the common name*/
-    peer=SSL_get_peer_certificate(ssl);
-    X509_NAME_get_text_by_NID(X509_get_subject_name(peer),
-      NID_commonName, peer_CN, 256);
-    printf("Peer CN=%s  & host= %s\n",peer_CN,host);
-    printf("strcasecmp(%s,%s)=%d\n",peer_CN,host,strcasecmp(peer_CN,host));
-
-
-    if(strcasecmp(peer_CN,host))
-    	err_exit("Common name doesn't match host name");
-  }
-
-
+    if ( SSL_accept(ssl) == FAIL )     /* do SSL-protocol accept */
+        ERR_print_errors_fp(stderr);
+    else
+    {
+        ShowCerts(ssl);        /* get any certificates */
+        bytes = SSL_read(ssl, buf, sizeof(buf)); /* get request */
+        if ( bytes > 0 )
+        {
+            buf[bytes] = 0;
+            printf("Client msg: \"%s\"\n", buf);
+            sprintf(reply, HTMLecho, buf);   /* construct reply */
+            SSL_write(ssl, reply, strlen(reply)); /* send reply */
+        }
+        else
+            ERR_print_errors_fp(stderr);
+    }
+    sd = SSL_get_fd(ssl);       /* get socket connection */
+    SSL_free(ssl);         /* release SSL state */
+    close(sd);          /* close connection */
+}

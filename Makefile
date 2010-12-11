@@ -1,24 +1,24 @@
 # project client server openssl c 
-# with g A b R i E L <lie.in.our.days@gmail.com> on chili
+# with gabriel on chili
 # write fakessh@fakessh.eu
 # date vendredi 26 novembre 13:27:10 CET 2010
 
 
 PATHSYSINCL := /usr/include
 PATHSSLLIB := /usr/lib
-SSLLIBS := -lssl -lcrypto -pthread
+SSLLIBS := -lssl -lcrypto -pthread 
 CC := gcc
-CFLAGS := -g
+CFLAGS := -g -Wextra
 CLIENTBINHTTP := sslclienthttp
 CLIENTBIN := sslclient
 SERVERBIN := sslserver
 
 all: sslserver sslclient
 
-sslserver: sslServer.o server.o echo.o common.o
+sslserver: sslServer.o  common.o
 	$(CC) $^ -o $(SERVERBIN) -L$(PATHSSLLIB) $(SSLLIBS)
 
-sslclient: sslClient.o client.o read_writecommon.o commonclient.o
+sslclient: sslClient.o  commonclient.o
 	$(CC) $^ -o $(CLIENTBIN) -L$(PATHSSLLIB) $(SSLLIBS)
 
 sslClient.o : sslClient.c
@@ -31,7 +31,7 @@ client.o : client.c
 	$(CC) $(CFLAGS) -I$(PATHSYSINCL) -Wall -c -o $@ $<
 server.o : server.c
 	$(CC) $(CFLAGS) -I$(PATHSYSINCL) -Wall -c -o $@ $<
-read_writecommon.o : read_writecommon.c
+read_write.o : read_write.c
 	$(CC) $(CFLAGS) -I$(PATHSYSINCL) -Wall -c -o $@ $<
 common.o : common.c
 	$(CC) $(CFLAGS) -I$(PATHSYSINCL) -Wall -c -o $@ $<
