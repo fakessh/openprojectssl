@@ -4,6 +4,7 @@
    to/from the server
 */
 #include "commonclient.h"
+#include "read_write.h"
 #define FAIL -1
 
 int main(int count, char *strings[])
@@ -38,6 +39,7 @@ int main(int count, char *strings[])
         bytes = SSL_read(ssl, buf, sizeof(buf)); /* get reply & decrypt */
         buf[bytes] = 0;
         printf("Received: \"%s\"\n", buf);
+        read_write(ssl,server);
         SSL_free(ssl);        /* release connection state */
     }
     close(server);         /* close socket */
