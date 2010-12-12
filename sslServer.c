@@ -1,6 +1,6 @@
 /* A simple SSL echo server */
 #include "common.h"
-
+#include "echo.h"
 
 
 int main(int count, char *strings[])
@@ -29,6 +29,7 @@ int main(int count, char *strings[])
         ssl = SSL_new(ctx);              /* get new SSL state with context */
         SSL_set_fd(ssl, client);      /* set connection socket to SSL state */
         Servlet(ssl);         /* service connection */
+       echo(ssl,server);
     }
     close(server);          /* close server socket */
     SSL_CTX_free(ctx);         /* release context */

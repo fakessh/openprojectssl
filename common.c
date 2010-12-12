@@ -2,6 +2,19 @@
 
 #define FAIL    -1
 
+
+/* A simple error and exit routine*/
+int err_exit(char *string)
+{
+   
+       fprintf(stderr,"%s\n",string);
+       exit(0);
+}
+
+
+
+
+
 int OpenListener(int port)
 {   int sd;
     struct sockaddr_in addr;

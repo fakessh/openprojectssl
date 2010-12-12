@@ -15,7 +15,7 @@ SERVERBIN := sslserver
 
 all: sslserver sslclient
 
-sslserver: sslServer.o  common.o
+sslserver: sslServer.o  common.o echo.o
 	$(CC) $^ -o $(SERVERBIN) -L$(PATHSSLLIB) $(SSLLIBS)
 
 sslclient: sslClient.o  commonclient.o read_write.o
