@@ -1,8 +1,7 @@
 #include "common.h"
 
-void echo(ssl,s)
+void echo(ssl)
   SSL *ssl;
-  int s;
   {
     char buf[BUFSIZZ];
     int r,len,offset;
@@ -10,6 +9,7 @@ void echo(ssl,s)
     while(1){
       /* First read data */
       r=SSL_read(ssl,buf,BUFSIZZ);
+      write(1,buf,r);
       switch(SSL_get_error(ssl,r)){
         case SSL_ERROR_NONE:
           len=r;
@@ -38,6 +38,5 @@ void echo(ssl,s)
   end:
     SSL_shutdown(ssl);
     SSL_free(ssl);
-    close(s);
   }      
     
