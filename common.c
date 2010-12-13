@@ -1,12 +1,6 @@
 #include "common.h"
 
 #define FAIL    -1
-/* A simple error and exit routine*/
-int err_exit(char *string)
-  {
-    fprintf(stderr,"%s\n",string);
-    exit(0);
-  }
 
 int OpenListener(int port)
 {   int sd;
@@ -92,7 +86,6 @@ void Servlet(SSL* ssl) /* Serve the connection -- threadable */
 {   char buf[1024];
     char reply[1024];
     int sd, bytes;
-  int r,len,offset;
     const char* HTMLecho="<html><body><pre>%s</pre></body></html>\n\n";
 
     if ( SSL_accept(ssl) == FAIL )     /* do SSL-protocol accept */
@@ -107,42 +100,11 @@ void Servlet(SSL* ssl) /* Serve the connection -- threadable */
             printf("Client msg: \"%s\"\n", buf);
             sprintf(reply, HTMLecho, buf);   /* construct reply */
             SSL_write(ssl, reply, strlen(reply)); /* send reply */
-	}
-    
-    while(1){
-      /* First read data */
-      r=SSL_read(ssl,buf,BUFSIZZ);
-      write(1,buf,r);
-      switch(SSL_get_error(ssl,r)){
-        case SSL_ERROR_NONE:
-          len=r;
-          break;
-        case SSL_ERROR_ZERO_RETURN:
-          break;
-        default:
-          err_exit("SSL read problem");
-      }
-
-      /* Now keep writing until we've written everything*/
-      offset=0;
-      
-      while(len){
-        r=SSL_write(ssl,buf+offset,len);
-        switch(SSL_get_error(ssl,r)){
-          case SSL_ERROR_NONE:
-            len-=r;
-            offset+=r;
-            break;
-          default:
-            err_exit("SSL write problem");
         }
-      }
+        else
+            ERR_print_errors_fp(stderr);
     }
-}
-      
-    
     sd = SSL_get_fd(ssl);       /* get socket connection */
     SSL_free(ssl);         /* release SSL state */
     close(sd);          /* close connection */
 }
-       
