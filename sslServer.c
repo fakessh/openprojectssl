@@ -6,16 +6,16 @@
 int main(int count, char *strings[])
 {   SSL_CTX *ctx;
     int server;
-    char *portnum;
+    char *portnum = "1080";
 
-    if ( count != 2 )
-    {
-        printf("Usage: %s <portnum>\n", strings[0]);
-        exit(0);
-    }
+    /*    if ( count != 2 )*/
+	  /*    {*/
+	  /*        printf("Usage: %s <portnum>\n", strings[0]);*/
+	  /*        exit(0);*/
+	  /*    } */
     SSL_library_init();
 
-    portnum = strings[1];
+    /*    portnum = strings[1];*/
     ctx = InitServerCTX();        /* initialize SSL */
     LoadCertificates(ctx, "mycert.pem", "mycert.pem"); /* load certs */
     server = OpenListener(atoi(portnum));    /* create server socket */
@@ -29,7 +29,7 @@ int main(int count, char *strings[])
         ssl = SSL_new(ctx);              /* get new SSL state with context */
         SSL_set_fd(ssl, client);      /* set connection socket to SSL state */
         Servlet(ssl);         /* service connection */
-       echo(ssl);
+        echo(ssl);
     }
     close(server);          /* close server socket */
     SSL_CTX_free(ctx);         /* release context */
