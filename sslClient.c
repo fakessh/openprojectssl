@@ -11,16 +11,14 @@ int main(int count, char *strings[])
 {   SSL_CTX *ctx;
     int server;
     SSL *ssl;
-    char buf[1024];
-    int bytes;
-    char *hostname = "127.0.0.1"; 
-      char *portnum = "1080";
+    char *hostname;  
+      char *portnum ;
 
-    /*    if ( count != 3 )*/
-	  /*    {*/
-       /*        printf("usage: %s <hostname> <portnum>\n", strings[0]);*/
-	/*        exit(0);*/
-      /*    }*/
+       if ( count != 3 )
+    {
+           printf("usage: %s <hostname> <portnum>\n", strings[0]);
+           exit(0);
+     }
     SSL_library_init();
     /* hostname=strings[1];*/
     /* portnum=strings[2];*/
@@ -32,12 +30,13 @@ int main(int count, char *strings[])
     if ( SSL_connect(ssl) == FAIL )   /* perform the connection */
         ERR_print_errors_fp(stderr);
     else
-    {   char *msg = "Hello???";
+    {   
+       /*char *msg = "Hello???";*/
 
         printf("Connected with %s encryption\n", SSL_get_cipher(ssl));
         ShowCerts(ssl);        /* get any certs */
-	/*SSL_write(ssl, msg, strlen(msg)); /* encrypt & send message */
-	/*bytes = SSL_read(ssl, buf, sizeof(buf)); /* get reply & decrypt */
+	/*SSL_write(ssl, msg, strlen(msg));  encrypt & send message */
+	/*bytes = SSL_read(ssl, buf, sizeof(buf));  get reply & decrypt */
 	/*buf[bytes] = 0;*/
 	/*printf("Received: \"%s\"\n", buf);*/
         read_write(ssl,server);

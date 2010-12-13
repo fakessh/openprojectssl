@@ -6,13 +6,13 @@
 int main(int count, char *strings[])
 {   SSL_CTX *ctx;
     int server;
-    char *portnum = "1080";
+    char *portnum;
 
-    /*    if ( count != 2 )*/
-	  /*    {*/
-	  /*        printf("Usage: %s <portnum>\n", strings[0]);*/
-	  /*        exit(0);*/
-	  /*    } */
+    if ( count != 2 )
+    {
+             printf("Usage: %s <portnum>\n", strings[0]);
+             exit(0);
+     } 
     SSL_library_init();
 
     /*    portnum = strings[1];*/
