@@ -9,7 +9,7 @@ void read_write (SSL *ssl,int  sock)
 
         int r,  c2sl=0;
 
-        int shutdown_wait=0;
+/*        int shutdown_wait=0;*/
         char c2s[BUFSIZZ], s2c[BUFSIZZ];
 
         while(1){
