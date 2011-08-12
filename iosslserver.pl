@@ -10,7 +10,7 @@ my  $PORT = 8000;
 my $server = IO::Socket::SSL->new( Proto     => 'tcp',
                                   LocalPort => $PORT,
                                   Listen    => 5 ,
-                                  SSL_verify_mode => 0x00,
+                                  SSL_verify_mode => 0x04,
                                   SSL_key_file    => '/tmp/ssl/key.txt',
                                   SSL_cert_file   => '/tmp/ssl/cert.txt',
                                   Reuse     => 1);
