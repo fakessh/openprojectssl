@@ -1,4 +1,4 @@
-#!/usr/bin/perl -wl
+#!/usr/bin/perl -w
 use strict;
 use warnings;
 use Mail::POP3Client;
