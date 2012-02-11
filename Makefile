@@ -14,8 +14,9 @@ CLIENTBINHTTP := sslclienthttp
 CLIENTBIN := sslclient
 SERVERBIN := sslserver
 ECHOSERVERGNUTLS := echoservergnutls
+ECHOSERVERGNUTLSOPENPGP := echoservergnutlsopenpgp
 
-all: sslserver sslclient echoservergnutls
+all: sslserver sslclient echoservergnutls echoservergnutlsopenpgp
 
 sslserver: sslServer.o  common.o
 	$(CC) $^ -o $(SERVERBIN) -L$(PATHSSLLIB) $(SSLLIBS)
@@ -23,7 +24,9 @@ sslclient: sslClient.o  commonclient.o
 	$(CC) $^ -o $(CLIENTBIN) -L$(PATHSSLLIB) $(SSLLIBS)
 echoservergnutls: echoservergnutls.o
         $(CC) $^ -o $(ECHOSERVERGNUTLS) -L$(PATHSSLLIB) $(GNUTLSLIBS)
-
+echoservergnutlsopenpgp: echoservergnutlsopenpgp.o
+        $(CC) $^ -o $(ECHOSERVERGNUTLSOPENPGP) -L$(PATHSSLLIB) $(GNUTLSLIBS)
+	
 sslClient.o : sslClient.c
 	$(CC) $(CFLAGS) -I$(PATHSYSINCL) -Wall -c -o $@ $<
 sslServer.o : sslServer.c
@@ -31,6 +34,8 @@ sslServer.o : sslServer.c
 echo.o : echo.c
 	$(CC) $(CFLAGS) -I$(PATHSYSINCL) -Wall -c -o $@ $<
 echoservergnutls.o : echoservergnutls.c
+        $(CC) $(CFLAGS) -I$(PATHSYSINCL) -Wall -c -o $@ $<
+echoservergnutlsopenpgp.o : echoservergnutlsopenpgp.c
         $(CC) $(CFLAGS) -I$(PATHSYSINCL) -Wall -c -o $@ $<
 	
 client.o : client.c
@@ -48,10 +53,14 @@ install :
 	mkdir bin
 	mv $(CLIENTBIN) bin
 	mv $(SERVERBIN) bin
+	mv $(ECHOSERVERGNUTLS) bin
+	mv $(ECHOSERVERGNUTLSOPENPGP) bin
 clean:
 	clear
 	rm -f *.o
 	rm -f $(CLIENTBIN)
 	rm -f $(SERVERBIN)
+	rm -f $(ECHOSERVERGNUTLS)
+	rm -f $(ECHOSERVERGNUTLSOPENPGP)
 	rm -f bin/*
 	rmdir bin
