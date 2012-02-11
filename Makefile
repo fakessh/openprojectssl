@@ -15,8 +15,16 @@ CLIENTBIN := sslclient
 SERVERBIN := sslserver
 ECHOSERVERGNUTLS := echoservergnutls
 ECHOSERVERGNUTLSOPENPGP := echoservergnutlsopenpgp
+CLIBSFLAGS = -ansi -Wall -pedantic -x c
+AR = ar
+AFLAGS = rcs
+LIB = libhypnotice.a
+LIBDIR = /opt/hypnotice/dev/lib
+HDRDIR = /opt/hypnotice/dev/headers
+DEBUG =
 
-all: sslserver sslclient echoservergnutls echoservergnutlsopenpgp
+all: sslserver sslclient echoservergnutls echoservergnutlsopenpgp \
+     libhypnotice
 
 sslserver: sslServer.o  common.o
 	$(CC) $^ -o $(SERVERBIN) -L$(PATHSSLLIB) $(SSLLIBS)
@@ -26,7 +34,8 @@ echoservergnutls: echoservergnutls.o
         $(CC) $^ -o $(ECHOSERVERGNUTLS) -L$(PATHSSLLIB) $(GNUTLSLIBS)
 echoservergnutlsopenpgp: echoservergnutlsopenpgp.o
         $(CC) $^ -o $(ECHOSERVERGNUTLSOPENPGP) -L$(PATHSSLLIB) $(GNUTLSLIBS)
-	
+libhypnotice : hypnotice.o
+	     $(AR) $(AFLAGS) $(LIB) $^
 sslClient.o : sslClient.c
 	$(CC) $(CFLAGS) -I$(PATHSYSINCL) -Wall -c -o $@ $<
 sslServer.o : sslServer.c
@@ -37,7 +46,10 @@ echoservergnutls.o : echoservergnutls.c
         $(CC) $(CFLAGS) -I$(PATHSYSINCL) -Wall -c -o $@ $<
 echoservergnutlsopenpgp.o : echoservergnutlsopenpgp.c
         $(CC) $(CFLAGS) -I$(PATHSYSINCL) -Wall -c -o $@ $<
-	
+
+hipopt.o: hypnotice.c hypnotice.h
+	  $(CC) $< $(CLIBSFLAGS) $(DEBUG) -c -o $@
+
 client.o : client.c
 	$(CC) $(CFLAGS) -I$(PATHSYSINCL) -Wall -c -o $@ $<
 server.o : server.c
@@ -55,6 +67,10 @@ install :
 	mv $(SERVERBIN) bin
 	mv $(ECHOSERVERGNUTLS) bin
 	mv $(ECHOSERVERGNUTLSOPENPGP) bin
+	cp $(LIB) $(LIBDIR)
+        if test ! -d $(HDRDIR)/hypnotice; then mkdir
+$(HDRDIR)/hypnotice; fi
+        cp hypnotice.h $(HDRDIR)/hypnotice
 clean:
 	clear
 	rm -f *.o
