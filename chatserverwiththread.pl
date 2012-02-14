@@ -65,4 +65,6 @@ sub process_it {
 #close filehandle before detached thread dies out
 close( $lclient);
 #remove multi-echo-clients from echo list
+@clients = grep {$_ !~ $lfileno} @clients;
+
 } 
