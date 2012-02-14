@@ -14,7 +14,7 @@ our @clients : shared;
 @clients = ();
 
 my $server = new IO::Socket::SSL(
-				 Timeout => 7200,
+				 Timeout => 60,
 				 Proto => "tcp",
 				 LocalPort => 42000,
 				 Reuse => 1,
