@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-use CGI ":all";
 use HTTP::Daemon;
 use HTTP::Status;
 use Chatbot::Eliza;
@@ -14,9 +13,8 @@ my $s = Server::TchatSSL::CGI->new(@ARGV);
 $s->background(
                SSL_cert_file => '/home/swilting/perltest/private/localhost.key',
                SSL_key_file  => '/home/swilting/perltest/certs/localhost.cert',
-	       port          => '42000',
               );
-__PACKAGE__->run();
+ChatServer->run(port => 42000);
 exit;
 
 package Server::TchatSSL::CGI;
@@ -26,46 +24,7 @@ use strict;
 use base qw(Net::Server::Multiplex);
 sub net_server { 'Net::Server::PreFork' }
 
-package HTTP::Server::Simple::CGI;
-
-
-use HTTP::Server::Simple::CGI;
-use base qw(HTTP::Server::Simple::CGI);
-
-my %dispatch = (
-        'hello' => \&handle_request,    
-);
-sub handle_request {
-     my $self = shift;
-     my $cgi  = shift;
-
-     my $path = $cgi->path_info();
-     my $handler = $dispatch{$path};
-
-    if (ref($handler) eq "CODE") {
-        print "HTTP/1.0 200 OK\r\n";
-        $handler->($cgi);
-	} else {
-           print "HTTP/1.0 404 Not found\r\n";
-           print $cgi->header,
-           $cgi->start_html('not found'),
-           $cgi->h1('not found'),
-           $cgi->end_html;
-       }
-}
-
-sub resp_hello {
-            my $cgi  = shift;   # CGI.pm object
-            return if !ref $cgi;
-
-   my $who = $cgi->param('name');
-
-   print $cgi->header,
-                  $cgi->start_html("Hello"),
-                  $cgi->h1("Hello $who!"),
-                  $cgi->end_html;
-}
-package SampleChatServer;
+package ChatServer;
 
 use strict;
 use base qw(Net::Server::Multiplex);
