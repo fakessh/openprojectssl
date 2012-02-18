@@ -19,7 +19,7 @@ sub process_msg {
 
 my $server = IO::Socket::SSL->new(
 
-LocalPort => 42011,
+LocalPort => 42001,
                                  Proto     => 'tcp',
                                  Reuse     => 1,
                                  Listen    => 10,
@@ -74,5 +74,6 @@ while (my @ready = $select->can_read) {
 		}
 	    }
 	}
+    close($server);
     }
 __END__
