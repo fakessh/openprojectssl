@@ -8,16 +8,24 @@ import socket
 import ssl
 import threading
 import sys
+import re
+
+
+def isValidIp(ip):
+    ip = ip.split(".")
+    for octet in ip:
+        if int(octet) > 255:
+            return False
+    return True
 
 mode = raw_input('Server(s) or Client(c) mode: ')
 while (mode=='c' or mode=='s')==False:
 	print 'ERROR: Response must be "s" or "c"'
 	mode = raw_input('Server(s) or Client(c) mode: ')
 if mode=='c':
-##	host = raw_input('Host address: ')
-##	while len(host.split('.'))!=4 or host.split('.')[0]>'255' or host.split('.')[1]>'255' or host.split('.')[2]>'255' or host.split('.')[3]>'255':
-##		print 'ERROR: IP address not formatted correctly'
-		host = raw_input('Host address: ')	
+	host = raw_input('Host address: ')
+        if isValidIp(host) is False:
+                raise ValueError("L'adresse ip n'est pas valide")  
 port = int(raw_input('Port: '))
 while port<0 or port>65535:
 	print 'ERROR: Port number out of range'
@@ -28,12 +36,12 @@ r=0
 if mode=='c':
 	#Start Client
 	conn[s] = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-	ssl_sock_1 = ssl.wrap_socket(conn[s],server_side=True, certfile="/home/fakessh/ks37777.kimsufi.cert",keyfile="/home/fakessh/ks37777.kimsufi.com.key", ssl_version=ssl.PROTOCOL_SSLv3)
+	ssl_sock_1 = ssl.wrap_socket(conn[s],server_side=True, certfile="/home/fakessh/ks37777.kimsufi.com.cert",keyfile="/home/fakessh/ks37777.kimsufi.com.key", ssl_version=ssl.PROTOCOL_SSLv3)
 
 	ssl_sock_1.connect((host,port))
 	ssl_sock_1.send('::transmit')
 	conn[r] = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-	ssl_sock_2 = ssl.wrap_socket(conn[r],server_side=True, certfile="/home/fakessh/ks37777.kimsufi.cert",keyfile="/home/fakessh/ks37777.kimsufi.com.key", ssl_version=ssl.PROTOCOL_SSLv3)
+	ssl_sock_2 = ssl.wrap_socket(conn[r],server_side=True, certfile="/home/fakessh/ks37777.kimsufi.com.cert",keyfile="/home/fakessh/ks37777.kimsufi.com.key", ssl_version=ssl.PROTOCOL_SSLv3)
 
 	ssl_sock_2.connect((host,port))
 else:
