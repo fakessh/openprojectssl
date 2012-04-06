@@ -8,12 +8,21 @@ my ($host, $port, $kidpid, $handle, $line);
 
 unless (@ARGV == 2) { die "usage: $0 host port" }
 ($host, $port) = @ARGV;
-
+$IO::Socket::SSL::DEBUG = 3;
+# Check to make sure that we were not accidentally run in the wrong
+# directory:
+unless (-d "certs") {
+        if (-d "../certs") {
+	    chdir "..";
+	 } else {
+     die "Please run this example from the IO::Socket::SSL distribution directory!\n";
+	 }
+ }
 # cree une connexion tcp a l'hote et sur le port specifie
 $handle = IO::Socket::SSL->new(Proto     => "tcp",
-	                           SSL_verify_mode => 0x04,
-	                            SSL_key_file    => '/tmp/ssl/key.txt',
-	                            SSL_cert_file   => '/tmp/ssl/cert.txt',
+                                    SSL_use_cert => 1,
+                                    SSL_verify_mode => 0x01,
+                                    SSL_passwd_cb => sub { return "opossum" },
                                     PeerAddr  => $host,
                                     PeerPort  => $port)
            or die "can't connect to port $port on $host: $!";
