@@ -244,6 +244,10 @@ void sendemail(char *email, char *body)
     	SSL_set_fd   (ssl,   sockfd);
    	err   =   SSL_connect(ssl);                                           
 	CHK_SSL(err);
+   
+        send_line(ssl,"EHLO localhost\r\n");
+        recv_line(ssl);
+   
 	send_line(ssl,"AUTH LOGIN\r\n");
     	recv_line(ssl); 	
 
