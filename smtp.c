@@ -23,6 +23,7 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <sys/select.h>
+#include <strings.h>
 #endif
 
 #define   CHK_NULL(x)   if   ((x)==NULL)   exit   (1)
@@ -30,7 +31,7 @@
 #define   CHK_SSL(err)   if   ((err)==-1)   {   ERR_print_errors_fp(stderr);   exit(2);   }
 
 
-
+const int CHARS_PER_LINE = 72;
 void send_line(SSL* ssl,char* cmd);
 void recv_line(SSL* ssl);
 void sendemail(char *email,char *body);
