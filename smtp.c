@@ -39,7 +39,7 @@ struct data6
 
 
 char con628(char c6);
-void base64(char *dbuf, char *buf128, int len); 
+void base64(char *dbuf,char *buf128, int len); 
 void send_line(SSL* ssl,char* cmd);
 void recv_line(SSL* ssl);
 void sendemail(char *email,char *body);
@@ -47,9 +47,9 @@ int open_socket(struct sockaddr *addr);
 
 int main()
 {
-	char email[] = "swilting@wanadoo.fr";
-	char body[] = "From: \"www\"<swilting@wanadoo.fr>\r\n"
-		"To: \"w111\"<john@wanadoo.fr>\r\n"
+	char email[] = "fakessh@fakessh.eu";
+	char body[] = "From: \"www\"<fakessh@fakessh.eu>\r\n"
+		"To: \"w111\"<john.swilting@wanadoo.fr>\r\n"
 	"Subject: Hello\r\n\r\n"
 	"Hello World, Hello Email!";
 	sendemail(email, body);
@@ -68,12 +68,12 @@ char con628(char c6)
 }
 
 //realizing base64
-void base64(char *dbuf, char *buf128, int len)
+void base64(char *dbuf,char *buf128, int len)
 {
 	struct data6 *ddd = NULL;
 	int i = 0;
 	char buf[256] = {0};
-	char *tmp = NULL;
+        char *tmp = NULL;
 	char cc = '\0';
 	memset(buf, 0, 256);
 	strcpy(buf, buf128);
@@ -161,7 +161,7 @@ void sendemail(char *email, char *body)
 	int sockfd;
 	int retval = 0;
 	int err;
-	char *host_name = "smtp.wanadoo.fr";
+	char *host_name = "smtp.fakessh.eu";
 	struct sockaddr_in their_addr;
 	struct hostent *hent;
 	char buf[1500] = {0};
@@ -223,7 +223,7 @@ void sendemail(char *email, char *body)
 
 	//EHLO
 	memset(buf, 0, 1500);
-	sprintf(buf, "EHLO\r\n");
+	sprintf(buf, "EHLO localhost\r\n");
 	send(sockfd, buf, strlen(buf), 0);
 	memset(rbuf, 0, 1500);
 	recv(sockfd, rbuf, 1500, 0);
@@ -245,15 +245,20 @@ void sendemail(char *email, char *body)
    	err   =   SSL_connect(ssl);                                           
 	CHK_SSL(err);
    
-        send_line(ssl,"EHLO localhost\r\n");
-        recv_line(ssl);
+        memset(buf,0, 1500);
+        sprintf(buf, "EHLO localhost\r\n");
+        send_line(ssl,buf);
+        recv_line(ssl); 
    
-	send_line(ssl,"AUTH LOGIN\r\n");
+	
+        memset(buf,0, 1500);
+        sprintf(buf, "AUTH LOGIN\r\n");
+        send_line(ssl,buf);
     	recv_line(ssl); 	
 
 	//USER
 	memset(buf, 0, 1500);
-	sprintf(buf,"john.swilting@wanadoo.fr");
+	sprintf(buf,"fakessh");
 	memset(login, 0, 128);
 	base64(login, buf, strlen(buf));
 	sprintf(buf, "%s\r\n", login);
@@ -262,7 +267,7 @@ void sendemail(char *email, char *body)
 
 	//PASSWORD
 	memset(buf, 0, 1500);
-	sprintf(buf, "-----");
+	sprintf(buf, "sV;5ohe1b/sV;5ohe1b/HdwnKKPvHdwnKKPv04750475");
 	memset(pass, 0, 128);
 	base64(pass, buf, strlen(buf));
 	sprintf(buf, "%s\r\n", pass);
@@ -270,18 +275,22 @@ void sendemail(char *email, char *body)
     	recv_line(ssl);
 
 	//MAIL FROM
-	send_line(ssl,"MAIL FROM:<swilting@wanadoo.fr>\r\n");
+        memset(buf,0, 1500);
+        sprintf(buf, "MAIL FROM:<fakessh@fakessh.eu>\r\n");
+	send_line(ssl,buf);
     	recv_line(ssl);
 
 	//RCPT TO first receiver
 	memset(buf, 0, 1500);
-	sprintf(buf, "RCPT TO:<%s>\r\n", email);
+	sprintf(buf, "RCPT TO:<john.swilting@wanadoo.fr>\r\n");
 	send_line(ssl,buf);
     	recv_line(ssl);
 
 	//RCPT TO second receiver and more receivers can be added
-	send_line(ssl,"RCPT TO:<john@wanadoo.fr>\r\n");
-    	recv_line(ssl);
+        //memset(buf, 0, 1500);
+        //sprintf(buf, "RCPT TO:<john.swilting@wanadoo.fr>\r\n");
+	//send_line(ssl,buf);
+    	//recv_line(ssl);
 
 	//DATA ready to send mail content
 	send_line(ssl,"DATA\r\n");
