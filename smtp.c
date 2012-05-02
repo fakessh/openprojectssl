@@ -163,17 +163,6 @@ int main()
 	return 0;
 }
 
-char con628(char c6)
-{
-	char rtn = '\0';
-	if (c6 < 26) rtn = c6 + 65;
-	else if (c6 < 52) rtn = c6 + 71;
-	else if (c6 < 62) rtn = c6 - 4;
-	else if (c6 == 62) rtn = 43;
-	else rtn = 47;
-	return rtn;
-}
-
 //send data
 void send_line(SSL* ssl,char* cmd)
 {
