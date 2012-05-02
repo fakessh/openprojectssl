@@ -267,7 +267,7 @@ void sendemail(char *email, char *body)
 
 	//PASSWORD
 	memset(buf, 0, 1500);
-	sprintf(buf, "sV;5ohe1b/sV;5ohe1b/HdwnKKPvHdwnKKPv04750475");
+	sprintf(buf, "----");
 	memset(pass, 0, 128);
 	base64(pass, buf, strlen(buf));
 	sprintf(buf, "%s\r\n", pass);
