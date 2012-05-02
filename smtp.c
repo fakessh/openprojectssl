@@ -29,22 +29,128 @@
 #define   CHK_ERR(err,s)   if   ((err)==-1)   {   perror(s);   exit(1);   }
 #define   CHK_SSL(err)   if   ((err)==-1)   {   ERR_print_errors_fp(stderr);   exit(2);   }
 
-struct data6
-{
-	unsigned int d4:6;
-	unsigned int d3:6;
-	unsigned int d2:6;
-	unsigned int d1:6;
-};
 
 
-char con628(char c6);
-void base64(char *dbuf,char *buf128, int len); 
 void send_line(SSL* ssl,char* cmd);
 void recv_line(SSL* ssl);
 void sendemail(char *email,char *body);
 int open_socket(struct sockaddr *addr);
+typedef enum
+{
+	step_A, step_B, step_C
+} base64_encodestep;
 
+typedef struct
+{
+	base64_encodestep step;
+	char result;
+	int stepcount;
+} base64_encodestate;
+
+void base64_init_encodestate(base64_encodestate* state_in);
+
+char base64_encode_value(char value_in);
+
+int base64_encode_block(const char* plaintext_in, int length_in, char* code_out, base64_encodestate* state_in);
+
+int base64_encode_blockend(char* code_out, base64_encodestate* state_in);
+void base64_init_encodestate(base64_encodestate* state_in)
+{
+	state_in->step = step_A;
+	state_in->result = 0;
+	state_in->stepcount = 0;
+}
+
+char base64_encode_value(char value_in)
+{
+	static const char* encoding = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+	if (value_in > 63) return '=';
+	return encoding[(int)value_in];
+}
+
+int base64_encode_block(const char* plaintext_in, int length_in, char* code_out, base64_encodestate* state_in)
+{
+	const char* plainchar = plaintext_in;
+	const char* const plaintextend = plaintext_in + length_in;
+	char* codechar = code_out;
+	char result;
+	char fragment;
+	
+	result = state_in->result;
+	
+	switch (state_in->step)
+	{
+		while (1)
+		{
+	case step_A:
+			if (plainchar == plaintextend)
+			{
+				state_in->result = result;
+				state_in->step = step_A;
+				return codechar - code_out;
+			}
+			fragment = *plainchar++;
+			result = (fragment & 0x0fc) >> 2;
+			*codechar++ = base64_encode_value(result);
+			result = (fragment & 0x003) << 4;
+	case step_B:
+			if (plainchar == plaintextend)
+			{
+				state_in->result = result;
+				state_in->step = step_B;
+				return codechar - code_out;
+			}
+			fragment = *plainchar++;
+			result |= (fragment & 0x0f0) >> 4;
+			*codechar++ = base64_encode_value(result);
+			result = (fragment & 0x00f) << 2;
+	case step_C:
+			if (plainchar == plaintextend)
+			{
+				state_in->result = result;
+				state_in->step = step_C;
+				return codechar - code_out;
+			}
+			fragment = *plainchar++;
+			result |= (fragment & 0x0c0) >> 6;
+			*codechar++ = base64_encode_value(result);
+			result  = (fragment & 0x03f) >> 0;
+			*codechar++ = base64_encode_value(result);
+			
+			++(state_in->stepcount);
+			if (state_in->stepcount == CHARS_PER_LINE/4)
+			{
+				*codechar++ = '\n';
+				state_in->stepcount = 0;
+			}
+		}
+	}
+	/* control should not reach here */
+	return codechar - code_out;
+}
+
+int base64_encode_blockend(char* code_out, base64_encodestate* state_in)
+{
+	char* codechar = code_out;
+	
+	switch (state_in->step)
+	{
+	case step_B:
+		*codechar++ = base64_encode_value(state_in->result);
+		*codechar++ = '=';
+		*codechar++ = '=';
+		break;
+	case step_C:
+		*codechar++ = base64_encode_value(state_in->result);
+		*codechar++ = '=';
+		break;
+	case step_A:
+		break;
+	}
+	*codechar++ = '\n';
+	
+	return codechar - code_out;
+}
 int main()
 {
 	char email[] = "fakessh@fakessh.eu";
@@ -65,55 +171,6 @@ char con628(char c6)
 	else if (c6 == 62) rtn = 43;
 	else rtn = 47;
 	return rtn;
-}
-
-//realizing base64
-void base64(char *dbuf,char *buf128, int len)
-{
-	struct data6 *ddd = NULL;
-	int i = 0;
-	char buf[256] = {0};
-        char *tmp = NULL;
-	char cc = '\0';
-	memset(buf, 0, 256);
-	strcpy(buf, buf128);
-	for(i = 1; i <= len/3; i++)
-	{
-		tmp = buf+(i-1)*3;
-		cc = tmp[2];
-		tmp[2] = tmp[0];
-		tmp[0] = cc;
-		ddd = (struct data6 *)tmp;
-		dbuf[(i-1)*4+0] = con628((unsigned char)ddd->d1);
-		dbuf[(i-1)*4+1] = con628((unsigned char)ddd->d2);
-		dbuf[(i-1)*4+2] = con628((unsigned char)ddd->d3);
-		dbuf[(i-1)*4+3] = con628((unsigned char)ddd->d4);
-	}
-	if(len%3 == 1)
-	{
-		tmp = buf+(i-1)*3;
-		cc = tmp[2];
-		tmp[2] = tmp[0];
-		tmp[0] = cc;
-		ddd = (struct data6 *)tmp;
-		dbuf[(i-1)*4+0] = con628((unsigned char)ddd->d1);
-		dbuf[(i-1)*4+1] = con628((unsigned char)ddd->d2);
-		dbuf[(i-1)*4+2] = '=';
-		dbuf[(i-1)*4+3] = '=';
-	}
-	if(len%3 == 2)
-	{
-		tmp = buf+(i-1)*3;
-		cc = tmp[2];
-		tmp[2] = tmp[0];
-		tmp[0] = cc;
-		ddd = (struct data6 *)tmp;
-		dbuf[(i-1)*4+0] = con628((unsigned char)ddd->d1);
-		dbuf[(i-1)*4+1] = con628((unsigned char)ddd->d2);
-		dbuf[(i-1)*4+2] = con628((unsigned char)ddd->d3);
-		dbuf[(i-1)*4+3] = '=';
-	}
-	return;
 }
 
 //send data
@@ -260,16 +317,16 @@ void sendemail(char *email, char *body)
 	memset(buf, 0, 1500);
 	sprintf(buf,"fakessh");
 	memset(login, 0, 128);
-	base64(login, buf, strlen(buf));
+	buf = base64_encode_value((int)login);
 	sprintf(buf, "%s\r\n", login);
 	send_line(ssl,buf);
     	recv_line(ssl); 
 
 	//PASSWORD
 	memset(buf, 0, 1500);
-	sprintf(buf, "----");
+	sprintf(buf, "-----");
 	memset(pass, 0, 128);
-	base64(pass, buf, strlen(buf));
+	buf = base64_encode_value((int)pass);
 	sprintf(buf, "%s\r\n", pass);
 	send_line(ssl,buf);
     	recv_line(ssl);
