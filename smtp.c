@@ -84,10 +84,10 @@ void base64(char *dbuf,char *buf128, int len)
 		tmp[2] = tmp[0];
 		tmp[0] = cc;
 		ddd = (struct data6 *)tmp;
-		dbuf[(i-1)*4+0] = con628((unsigned char)ddd->d1);
-		dbuf[(i-1)*4+1] = con628((unsigned char)ddd->d2);
-		dbuf[(i-1)*4+2] = con628((unsigned char)ddd->d3);
-		dbuf[(i-1)*4+3] = con628((unsigned char)ddd->d4);
+		dbuf[(i-1)*4+0] = con628((unsigned int)ddd->d1);
+		dbuf[(i-1)*4+1] = con628((unsigned int)ddd->d2);
+		dbuf[(i-1)*4+2] = con628((unsigned int)ddd->d3);
+		dbuf[(i-1)*4+3] = con628((unsigned int)ddd->d4);
 	}
 	if(len%3 == 1)
 	{
@@ -96,8 +96,8 @@ void base64(char *dbuf,char *buf128, int len)
 		tmp[2] = tmp[0];
 		tmp[0] = cc;
 		ddd = (struct data6 *)tmp;
-		dbuf[(i-1)*4+0] = con628((unsigned char)ddd->d1);
-		dbuf[(i-1)*4+1] = con628((unsigned char)ddd->d2);
+		dbuf[(i-1)*4+0] = con628((unsigned int)ddd->d1);
+		dbuf[(i-1)*4+1] = con628((unsigned int)ddd->d2);
 		dbuf[(i-1)*4+2] = '=';
 		dbuf[(i-1)*4+3] = '=';
 	}
@@ -108,9 +108,9 @@ void base64(char *dbuf,char *buf128, int len)
 		tmp[2] = tmp[0];
 		tmp[0] = cc;
 		ddd = (struct data6 *)tmp;
-		dbuf[(i-1)*4+0] = con628((unsigned char)ddd->d1);
-		dbuf[(i-1)*4+1] = con628((unsigned char)ddd->d2);
-		dbuf[(i-1)*4+2] = con628((unsigned char)ddd->d3);
+		dbuf[(i-1)*4+0] = con628((unsigned int)ddd->d1);
+		dbuf[(i-1)*4+1] = con628((unsigned int)ddd->d2);
+		dbuf[(i-1)*4+2] = con628((unsigned int)ddd->d3);
 		dbuf[(i-1)*4+3] = '=';
 	}
 	return;
