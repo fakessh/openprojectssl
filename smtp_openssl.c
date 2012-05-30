@@ -218,9 +218,7 @@ void sendemail(char *email, char *body)
 	//USER
 	memset(buf, 0, 1500);
 	sprintf(buf,"webmail");
-	//memset(login, 0, strlen(login));
-	//base64(login, buf, strlen(buf));
-        //buf_login = buf;
+	
         login = base64 ( buf , strlen(buf));
 	sprintf(buf, "%s\r\n", login);
 	send_line(ssl,buf);
@@ -230,9 +228,7 @@ void sendemail(char *email, char *body)
 	//PASSWORD
 	memset(buf, 0, 1500);
 	sprintf(buf, "*******");
-	//memset(pass, 0, strlen(pass));
-	//base64(pass, buf, strlen(buf));
-        //buf_pass = buf;
+	
         pass = base64 ( buf , strlen(buf));
 	sprintf(buf, "%s\r\n", pass);
 	send_line(ssl,buf);
