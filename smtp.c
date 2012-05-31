@@ -25,6 +25,8 @@
 #include <sys/select.h>
 #include <linux/types.h>
 #endif
+#include <assert.h>
+#define CHK_NULL_ASSERT(x) assert (x != NULL )
 
 #define   CHK_NULL(x)   do { if   ((x)==NULL)   exit   (1); }while(0)
 #define   CHK_ERR(err,s)   if   ((err)==-1)   {   perror(s);   exit(1);   }
