@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include <openssl/ssl.h>
 #include <openssl/rand.h>
@@ -24,8 +25,9 @@
 #include <sys/wait.h>
 #include <sys/select.h>
 #include <linux/types.h>
-#endif
 #include <assert.h>
+#endif
+
 #define CHK_NULL_ASSERT(x) assert (x != NULL )
 
 #define   CHK_NULL(x)   do { if   ((x)==NULL)   exit   (1); }while(0)
