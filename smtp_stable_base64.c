@@ -34,7 +34,7 @@
 #define   CHK_ERR(err,s)   if   ((err)==-1)   {   perror(s);   exit(1);   }
 #define   CHK_SSL(err)   if   ((err)==-1)   {   ERR_print_errors_fp(stderr);   exit(2);   }
 
-
+#define TAILLE_TAMPON    1500
  
 void encodeblock( unsigned char in[], char b64str[], int len );
 void b64_encode(char *clrstr, char *b64dst);
@@ -153,8 +153,8 @@ void sendemail(char *email, char *body)
 	char *host_name = "smtp.fakessh.eu";
 	struct sockaddr_in their_addr;
 	struct hostent *hent;
-	char buf[1500] = {0};
-	char rbuf[1500] = {0};
+	char buf[TAILLE_TAMPON] = {0};
+	char rbuf[TAILLE_TAMPON] = {0};
 	char login[128] = {0};
 	char pass[128] = {0};
 
@@ -200,30 +200,30 @@ void sendemail(char *email, char *body)
 		sleep(2);
 		close(sockfd);
 		sockfd = open_socket((struct sockaddr *)&their_addr);
-		memset(rbuf,0,1500);
+		memset(rbuf,0,TAILLE_TAMPON);
 		FD_ZERO(&readfds); 
      		FD_SET(sockfd, &readfds);
       		retval = select(sockfd+1, &readfds, NULL, NULL, &timeout);
 	}
 
-	memset(rbuf, 0, 1500);
-	recv(sockfd, rbuf, 1500, 0);
+	memset(rbuf, 0, TAILLE_TAMPON);
+	recv(sockfd, rbuf, TAILLE_TAMPON, 0);
 	printf("%s\n", rbuf);
 
 	//EHLO
-	memset(buf, 0, 1500);
+	memset(buf, 0, TAILLE_TAMPON);
 	sprintf(buf, "EHLO localhost\r\n");
 	send(sockfd, buf, strlen(buf), 0);
-	memset(rbuf, 0, 1500);
-	recv(sockfd, rbuf, 1500, 0);
+	memset(rbuf, 0, TAILLE_TAMPON);
+	recv(sockfd, rbuf, TAILLE_TAMPON, 0);
 	printf("%s\n", rbuf);
 	
 	//START_TLS with OPENSSL 
-    	memset(buf,0, 1500);
+    	memset(buf,0, TAILLE_TAMPON);
 	sprintf(buf, "STARTTLS\r\n");
 	send(sockfd, buf, strlen(buf), 0);
-	memset(rbuf, 0, 1500);
-	recv(sockfd, rbuf, 1500, 0);
+	memset(rbuf, 0, TAILLE_TAMPON);
+	recv(sockfd, rbuf, TAILLE_TAMPON, 0);
 	printf("%s\n", rbuf);
 	
 	
@@ -235,19 +235,19 @@ void sendemail(char *email, char *body)
    	err   =   SSL_connect(ssl);                                           
 	CHK_SSL(err);
    
-        memset(buf,0, 1500);
+        memset(buf,0, TAILLE_TAMPON);
         sprintf(buf, "EHLO localhost\r\n");
         send_line(ssl,buf);
         recv_line(ssl); 
    
 	
-        memset(buf,0, 1500);
+        memset(buf,0, TAILLE_TAMPON);
         sprintf(buf, "AUTH LOGIN\r\n");
         send_line(ssl,buf);
     	recv_line(ssl); 	
 
 	//USER
-	memset(buf, 0, 1500);
+	memset(buf, 0, TAILLE_TAMPON);
 	sprintf(buf,"fakessh");
 	memset(login, 0, 128);
         b64_encode(buf, login);
@@ -256,8 +256,8 @@ void sendemail(char *email, char *body)
     	recv_line(ssl); 
 
 	//PASSWORD
-	memset(buf, 0, 1500);
-	sprintf(buf,"-----");
+	memset(buf, 0, TAILLE_TAMPON);
+	sprintf(buf, "------");
 	memset(pass, 0, 128);
         b64_encode(buf, pass);
 	sprintf(buf, "%s\r\n", pass);
@@ -265,13 +265,13 @@ void sendemail(char *email, char *body)
     	recv_line(ssl);
 
 	//MAIL FROM
-        memset(buf,0, 1500);
+        memset(buf,0, TAILLE_TAMPON);
         sprintf(buf, "MAIL FROM:<fakessh@fakessh.eu>\r\n");
 	send_line(ssl,buf);
     	recv_line(ssl);
 
 	//RCPT TO first receiver
-	memset(buf, 0, 1500);
+	memset(buf, 0, TAILLE_TAMPON);
 	sprintf(buf, "RCPT TO:<john.swilting@wanadoo.fr>\r\n");
 	send_line(ssl,buf);
     	recv_line(ssl);
@@ -287,7 +287,7 @@ void sendemail(char *email, char *body)
     	recv_line(ssl);
 
 	//send mail content£¬"\r\n.\r\n" is the end mark of content
-	memset(buf, 0, 1500);
+	memset(buf, 0, TAILLE_TAMPON);
 	sprintf(buf, "%s\r\n.\r\n", body);
 	send_line(ssl,buf);
     	recv_line(ssl);
@@ -302,8 +302,8 @@ void sendemail(char *email, char *body)
         #ifdef W32_NATIVE
         (void)closesocket(sockfd);
         #else
-	(void)close(sockfd); 
-        #endif
+	(void)close(sockfd);
+        #endif 
     	SSL_free (ssl);
     	SSL_CTX_free (ctx); 
 
