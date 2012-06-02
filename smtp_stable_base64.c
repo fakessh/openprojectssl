@@ -257,7 +257,7 @@ void sendemail(char *email, char *body)
 
 	//PASSWORD
 	memset(buf, 0, 1500);
-	sprintf(buf, "********");
+	sprintf(buf,"-----");
 	memset(pass, 0, 128);
         b64_encode(buf, pass);
 	sprintf(buf, "%s\r\n", pass);
@@ -299,7 +299,11 @@ void sendemail(char *email, char *body)
    
 	//free SSL and close socket
 	SSL_shutdown (ssl);
-	close(sockfd); 
+        #ifdef W32_NATIVE
+        (void)closesocket(sockfd);
+        #else
+	(void)close(sockfd); 
+        #endif
     	SSL_free (ssl);
     	SSL_CTX_free (ctx); 
 
