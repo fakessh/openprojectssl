@@ -35,6 +35,7 @@
 #define   CHK_SSL(err)   if   ((err)==-1)   {   ERR_print_errors_fp(stderr);   exit(2);   }
 
 #define TAILLE_TAMPON    1500
+#define TAILLE_TAMPON_BUF    128
  
 void encodeblock( unsigned char in[], char b64str[], int len );
 void b64_encode(char *clrstr, char *b64dst);
@@ -155,8 +156,8 @@ void sendemail(char *email, char *body)
 	struct hostent *hent;
 	char buf[TAILLE_TAMPON] = {0};
 	char rbuf[TAILLE_TAMPON] = {0};
-	char login[128] = {0};
-	char pass[128] = {0};
+	char login[TAILLE_TAMPON_BUF] = {0};
+	char pass[TAILLE_TAMPON_BUF] = {0};
 
 	//initialize SSL
 	SSL_CTX *ctx;
@@ -190,7 +191,7 @@ void sendemail(char *email, char *body)
 
 	//connecting mail server and reconnecting if no response in 2 seconds
 	sockfd = open_socket((struct sockaddr *)&their_addr);	
-	memset(rbuf,0,1500);
+	memset(rbuf,0,TAILLE_TAMPON);
 	FD_ZERO(&readfds); 
      	FD_SET(sockfd, &readfds);
       	retval = select(sockfd+1, &readfds, NULL, NULL, &timeout);
@@ -249,7 +250,7 @@ void sendemail(char *email, char *body)
 	//USER
 	memset(buf, 0, TAILLE_TAMPON);
 	sprintf(buf,"fakessh");
-	memset(login, 0, 128);
+	memset(login, 0, TAILLE_TAMPON_BUF);
         b64_encode(buf, login);
 	sprintf(buf, "%s\r\n", login);
 	send_line(ssl,buf);
@@ -257,8 +258,8 @@ void sendemail(char *email, char *body)
 
 	//PASSWORD
 	memset(buf, 0, TAILLE_TAMPON);
-	sprintf(buf, "------");
-	memset(pass, 0, 128);
+	sprintf(buf, "-------");
+	memset(pass, 0, TAILLE_TAMPON_BUF);
         b64_encode(buf, pass);
 	sprintf(buf, "%s\r\n", pass);
 	send_line(ssl,buf);
