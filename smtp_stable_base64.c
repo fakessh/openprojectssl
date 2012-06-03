@@ -35,7 +35,6 @@
 #define   CHK_SSL(err)   if   ((err)==-1)   {   ERR_print_errors_fp(stderr);   exit(2);   }
 
 #define TAILLE_TAMPON    1500
-#define TAILLE_TAMPON_BUF    128
  
 void encodeblock( unsigned char in[], char b64str[], int len );
 void b64_encode(char *clrstr, char *b64dst);
@@ -117,7 +116,7 @@ void send_line(SSL* ssl,char* cmd)
 //receive data
 void recv_line(SSL* ssl)
 {
-    	char rbuf[1500] = {0};
+    	char rbuf[TAILLE_TAMPON] = {0};
     	int err;
     	err = SSL_read (ssl, rbuf, sizeof(rbuf) - 1);
     	CHK_SSL(err);
@@ -156,8 +155,8 @@ void sendemail(char *email, char *body)
 	struct hostent *hent;
 	char buf[TAILLE_TAMPON] = {0};
 	char rbuf[TAILLE_TAMPON] = {0};
-	char login[TAILLE_TAMPON_BUF] = {0};
-	char pass[TAILLE_TAMPON_BUF] = {0};
+	char login[TAILLE_TAMPON] = {0};
+	char pass[TAILLE_TAMPON] = {0};
 
 	//initialize SSL
 	SSL_CTX *ctx;
@@ -250,7 +249,7 @@ void sendemail(char *email, char *body)
 	//USER
 	memset(buf, 0, TAILLE_TAMPON);
 	sprintf(buf,"fakessh");
-	memset(login, 0, TAILLE_TAMPON_BUF);
+	memset(login, 0, TAILLE_TAMPON);
         b64_encode(buf, login);
 	sprintf(buf, "%s\r\n", login);
 	send_line(ssl,buf);
@@ -259,7 +258,7 @@ void sendemail(char *email, char *body)
 	//PASSWORD
 	memset(buf, 0, TAILLE_TAMPON);
 	sprintf(buf, "-------");
-	memset(pass, 0, TAILLE_TAMPON_BUF);
+	memset(pass, 0, TAILLE_TAMPON);
         b64_encode(buf, pass);
 	sprintf(buf, "%s\r\n", pass);
 	send_line(ssl,buf);
