@@ -143,7 +143,7 @@ int open_socket(struct sockaddr *addr)
 		exit(-1);
 	}
         #ifdef W32_NATIVE
-        retval = connect(sockfd, (PSOCKADDR)addr, sizeof(struct sockaddr));
+        retval = connect(sockfd, addr, sizeof(struct sockaddr));
         #else
 	retval = connect(sockfd, addr, sizeof(struct sockaddr));
         #endif
@@ -199,7 +199,7 @@ void sendemail(char *email, char *body)
 	their_addr.sin_family = AF_INET;
 	their_addr.sin_port = htons(587);
         #ifdef W32_NATIVE
-        their_addr.sin_addr = *((LPIN_ADDR)*hent->h_addr);
+        their_addr.sin_addr = *((struct in_addr * ) hent->h_addr);
         #else
 	their_addr.sin_addr = *((struct in_addr *)hent->h_addr);
         #endif
@@ -272,7 +272,7 @@ void sendemail(char *email, char *body)
 
 	//PASSWORD
 	memset(buf, 0, TAILLE_TAMPON);
-	sprintf(buf, "fD6-\"[fD6-\"[sV;5ohe1b/sV;5ohe1b/HdwnKKPvHdwnKKPv04750475");
+	sprintf(buf,"-----");
 	memset(pass, 0, TAILLE_TAMPON);
         b64_encode(buf, pass);
 	sprintf(buf, "%s\r\n", pass);
