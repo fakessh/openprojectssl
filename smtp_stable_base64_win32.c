@@ -146,7 +146,7 @@ int open_socket(struct sockaddr *addr)
 		exit(-1);
 	}
         #ifdef W32_NATIVE
-        retval = connect(sockfd, addr, sizeof(struct sockaddr));
+        retval = connect(sockfd, (PSOCKADDR) addr, sizeof(struct sockaddr));
         #else
 	retval = connect(sockfd, addr, sizeof(struct sockaddr));
         #endif
