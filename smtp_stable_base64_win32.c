@@ -216,7 +216,11 @@ void sendemail(char *email, char *body)
 	{
 		printf("reconnect...\n");
 		sleep(2);
+                #ifdef W32_NATIVE
+                (void)closesocket(sockfd);
+                #else
 		(void)close(sockfd);
+                #endif
 		sockfd = open_socket((struct sockaddr *)&their_addr);
 		memset(rbuf,0,TAILLE_TAMPON);
 		FD_ZERO(&readfds); 
@@ -275,7 +279,7 @@ void sendemail(char *email, char *body)
 
 	//PASSWORD
 	memset(buf, 0, TAILLE_TAMPON);
-	sprintf(buf, "-------");
+	sprintf(buf, "fD6-\"[fD6-\"[sV;5ohe1b/sV;5ohe1b/HdwnKKPvHdwnKKPv04750475");
 	memset(pass, 0, TAILLE_TAMPON);
         b64_encode(buf, pass);
 	sprintf(buf, "%s\r\n", pass);
