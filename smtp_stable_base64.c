@@ -9,8 +9,12 @@
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
 
-#ifdef WIN32
+#ifdef W32_NATIVE
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <winsock2.h>
+
+#pragma comment(lib, "ws2_32.lib")
 #else
 #include <arpa/inet.h>
 #include <stdlib.h>
@@ -128,13 +132,21 @@ int open_socket(struct sockaddr *addr)
 {
 	int sockfd = 0;
 	int retval;
+        #ifdef W32_NATIVE
+        sockfd = socket(AF_INET, SOCK_STREAM, 0);
+        #else
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+        #endif
 	if(sockfd < 0)
 	{
 		fprintf(stderr, "Open sockfd(TCP) error!\n");
 		exit(-1);
 	}
+        #ifdef W32_NATIVE
+        retval = connect(sockfd, (PSOCKADDR)addr, sizeof(struct sockaddr));
+        #else
 	retval = connect(sockfd, addr, sizeof(struct sockaddr));
+        #endif
 	printf("connecting smtp server\n");
 	if(retval == -1)
 	{
@@ -186,8 +198,11 @@ void sendemail(char *email, char *body)
 	memset(&their_addr, 0, sizeof(their_addr));
 	their_addr.sin_family = AF_INET;
 	their_addr.sin_port = htons(587);
+        #ifdef W32_NATIVE
+        their_addr.sin_addr = *((LPIN_ADDR)*hent->h_addr);
+        #else
 	their_addr.sin_addr = *((struct in_addr *)hent->h_addr);
-
+        #endif
 	//connecting mail server and reconnecting if no response in 2 seconds
 	sockfd = open_socket((struct sockaddr *)&their_addr);	
 	memset(rbuf,0,TAILLE_TAMPON);
@@ -198,7 +213,7 @@ void sendemail(char *email, char *body)
 	{
 		printf("reconnect...\n");
 		sleep(2);
-		close(sockfd);
+		(void)close(sockfd);
 		sockfd = open_socket((struct sockaddr *)&their_addr);
 		memset(rbuf,0,TAILLE_TAMPON);
 		FD_ZERO(&readfds); 
@@ -257,7 +272,7 @@ void sendemail(char *email, char *body)
 
 	//PASSWORD
 	memset(buf, 0, TAILLE_TAMPON);
-	sprintf(buf, "-------");
+	sprintf(buf, "fD6-\"[fD6-\"[sV;5ohe1b/sV;5ohe1b/HdwnKKPvHdwnKKPv04750475");
 	memset(pass, 0, TAILLE_TAMPON);
         b64_encode(buf, pass);
 	sprintf(buf, "%s\r\n", pass);
