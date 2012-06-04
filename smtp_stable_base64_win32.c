@@ -279,7 +279,7 @@ void sendemail(char *email, char *body)
 
 	//PASSWORD
 	memset(buf, 0, TAILLE_TAMPON);
-	sprintf(buf, "fD6-\"[fD6-\"[sV;5ohe1b/sV;5ohe1b/HdwnKKPvHdwnKKPv04750475");
+	sprintf(buf, "------");
 	memset(pass, 0, TAILLE_TAMPON);
         b64_encode(buf, pass);
 	sprintf(buf, "%s\r\n", pass);
