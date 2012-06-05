@@ -30,6 +30,7 @@
 #include <sys/select.h>
 #include <string.h>
 #include <linux/types.h>
+#include <assert.h>
 #endif
 
 #define   CHK_NULL(x)   do { if   ((x)==NULL)   exit   (1); } while(0)
@@ -71,13 +72,13 @@ char *base64(char *input, int length)
   buff = malloc(bptr->length);
   CHK_NULL(buff);
    
-  #ifdef W32_NATIVE
+  //#ifdef W32_NATIVE
 	memset(buff,0,sizeof(char*));
 	memcpy(buff, bptr->data, bptr->length-1);
-  #else
-	bzero(buff, sizeof(char*));
-	sprintf(buff, "%s", bptr->data);
-  #endif
+  //#else
+  //	bzero(buff, sizeof(char*));
+  //	sprintf(buff, "%s", bptr->data);
+  //#endif
   
   buff[bptr->length-1] = '\0';
   BIO_free_all(b64);
