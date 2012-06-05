@@ -69,7 +69,8 @@ char *base64(char *input, int length)
   BIO_get_mem_ptr(b64, &bptr);
 
   buff = malloc(bptr->length);
-  
+  CHK_NULL(buff);
+   
   #ifdef W32_NATIVE
 	memset(buff,0,sizeof(char*));
 	memcpy(buff, bptr->data, bptr->length-1);
