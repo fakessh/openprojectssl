@@ -29,6 +29,7 @@
 #include <sys/wait.h>
 #include <sys/select.h>
 #include <string.h>
+#include <linux/types.h>
 #endif
 
 #define   CHK_NULL(x)   if   ((x)==NULL)   exit   (1)
@@ -36,8 +37,7 @@
 #define   CHK_SSL(err)   if   ((err)==-1)   {   ERR_print_errors_fp(stderr);   exit(2);   }
 
 
-//char con628(char c6);
-//void base64(char *dbuf,char *buf128, int len); 
+
 char *base64(char *input, int length);
 void send_line(SSL* ssl,char* cmd);
 void recv_line(SSL* ssl);
@@ -56,8 +56,10 @@ int main(int argc, char **argv)
 }
 char *base64(char *input, int length)
 {
-  BIO *bmem, *b64;
-  BUF_MEM *bptr;
+
+  BIO *bmem=NULL, *b64=NULL;
+  BUF_MEM *bptr=NULL;
+  char *buff=NULL;
 
   b64 = BIO_new(BIO_f_base64());
   bmem = BIO_new(BIO_s_mem());
@@ -66,12 +68,18 @@ char *base64(char *input, int length)
   BIO_flush(b64);
   BIO_get_mem_ptr(b64, &bptr);
 
-  char *buff = (char *)malloc(bptr->length+1);
-  memcpy(buff, bptr->data, bptr->length);
-  buff[bptr->length] = 0;
-
+  buff = malloc(bptr->length);
+  
+  #ifdef W32_NATIVE
+	memset(buff,0,sizeof(char*));
+	memcpy(buff, bptr->data, bptr->length-1);
+  #else
+	bzero(buff, sizeof(char*));
+	sprintf(buff, "%s", bptr->data);
+  #endif
+  
+  buff[bptr->length-1] = '\0';
   BIO_free_all(b64);
-
   return buff;
 }
 
@@ -217,8 +225,10 @@ void sendemail(char *email, char *body)
 
 	//USER
 	memset(buf, 0, 1500);
-	sprintf(buf,"webmail");
-	
+	sprintf(buf,"fakessh");
+	//memset(login, 0, strlen(login));
+	//base64(login, buf, strlen(buf));
+        //buf_login = buf;
         login = base64 ( buf , strlen(buf));
 	sprintf(buf, "%s\r\n", login);
 	send_line(ssl,buf);
@@ -227,8 +237,10 @@ void sendemail(char *email, char *body)
 
 	//PASSWORD
 	memset(buf, 0, 1500);
-	sprintf(buf, "*******");
-	
+	sprintf(buf, "--------");
+	//memset(pass, 0, strlen(pass));
+	//base64(pass, buf, strlen(buf));
+        //buf_pass = buf;
         pass = base64 ( buf , strlen(buf));
 	sprintf(buf, "%s\r\n", pass);
 	send_line(ssl,buf);
@@ -270,7 +282,11 @@ void sendemail(char *email, char *body)
    
 	//free SSL and close socket
 	SSL_shutdown (ssl);
-	close(sockfd); 
+        #ifdef W32_NATIVE
+        (void)closesocket(sockfd);
+        #else
+	(void)close(sockfd);
+        #endif
     	SSL_free (ssl);
     	SSL_CTX_free (ctx); 
 
