@@ -72,13 +72,13 @@ char *base64(char *input, int length)
   buff = malloc(bptr->length);
   CHK_NULL(buff);
    
-  //#ifdef W32_NATIVE
-	memset(buff,0,sizeof(char*));
+  #ifdef W32_NATIVE
+	memset(buff,0,sizeof(char*)+1);
 	memcpy(buff, bptr->data, bptr->length-1);
-  //#else
-  //	bzero(buff, sizeof(char*));
-  //	sprintf(buff, "%s", bptr->data);
-  //#endif
+  #else
+  	bzero(buff, sizeof(char*)+1);
+  	sprintf(buff, "%s", bptr->data);
+  #endif
   
   buff[bptr->length-1] = '\0';
   BIO_free_all(b64);
