@@ -39,7 +39,7 @@
 
 
 
-char *base64(char *input, int length);
+char *base64(char *input, size_t length);
 void send_line(SSL* ssl,char* cmd);
 void recv_line(SSL* ssl);
 void sendemail(char *email,char *body);
@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 	sendemail(email, body);
 	return 0;
 }
-char *base64(char *input, int length)
+char *base64(char *input, size_t length)
 {
 
   BIO *bmem=NULL, *b64=NULL;
