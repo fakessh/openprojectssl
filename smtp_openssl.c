@@ -65,22 +65,21 @@ char *base64(char *input, size_t length)
   b64 = BIO_new(BIO_f_base64());
   bmem = BIO_new(BIO_s_mem());
   b64 = BIO_push(b64, bmem);
-  BIO_write(b64, input, length);
-  BIO_flush(b64);
-  BIO_get_mem_ptr(b64, &bptr);
+  if ( BIO_write(b64, input, length) == length )
+     {
+	
+	(void)BIO_flush(b64);
+	BIO_get_mem_ptr(b64, &bptr);
 
-  buff = malloc(bptr->length);
-  CHK_NULL(buff);
+	buff = malloc(bptr->length+1);
+	CHK_NULL(buff);
+	if (buff) 
+	  {
+	     memcpy(buff , bptr->data , bptr->length-1);
+	     buff[bptr->length-1] = '\0';
+	  }
+     }
    
-  #ifdef W32_NATIVE
-	memset(buff,0,sizeof(char*)+1);
-	memcpy(buff, bptr->data, bptr->length-1);
-  #else
-  	bzero(buff, sizeof(char*)+1);
-  	sprintf(buff, "%s", bptr->data);
-  #endif
-  
-  buff[bptr->length-1] = '\0';
   BIO_free_all(b64);
   return buff;
 }
