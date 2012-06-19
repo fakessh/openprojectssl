@@ -203,6 +203,7 @@ void sendemail(char *email, char *body)
         #else
 	their_addr.sin_addr = *((struct in_addr *)hent->h_addr);
         #endif
+        memset(&(their_addr.sin_zero), 0, 8); 
 	//connecting mail server and reconnecting if no response in 2 seconds
 	sockfd = open_socket((struct sockaddr *)&their_addr);	
 	memset(rbuf,0,TAILLE_TAMPON);
