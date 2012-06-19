@@ -215,6 +215,7 @@ void sendemail(char *email, char *body)
 		printf("reconnect...\n");
 		sleep(2);
 		(void)close(sockfd);
+	         memset(&(their_addr.sin_zero), 0, 8);
 		sockfd = open_socket((struct sockaddr *)&their_addr);
 		memset(rbuf,0,TAILLE_TAMPON);
 		FD_ZERO(&readfds); 

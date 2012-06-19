@@ -167,6 +167,7 @@ void sendemail(char *email, char *body)
 	their_addr.sin_family = AF_INET;
 	their_addr.sin_port = htons(587);
 	their_addr.sin_addr = *((struct in_addr *)hent->h_addr);
+         memset(&(their_addr.sin_zero), 0, 8);
 
 	//connecting mail server and reconnecting if no response in 2 seconds
 	sockfd = open_socket((struct sockaddr *)&their_addr);	
@@ -179,6 +180,7 @@ void sendemail(char *email, char *body)
 		printf("reconnect...\n");
 		sleep(2);
 		close(sockfd);
+	         memset(&(their_addr.sin_zero), 0, 8);
 		sockfd = open_socket((struct sockaddr *)&their_addr);
 		memset(rbuf,0,1500);
 		FD_ZERO(&readfds); 
