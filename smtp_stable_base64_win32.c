@@ -10,7 +10,7 @@
 #include <openssl/hmac.h>
 /* Define to 1 if the native W32 API should be used. */
 #if (defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__
-#define W32_NATIVE 
+#define W32_NATIVE 1
 #endif
 #ifdef W32_NATIVE
 #define WIN32_LEAN_AND_MEAN
