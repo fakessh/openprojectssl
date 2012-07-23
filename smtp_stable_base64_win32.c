@@ -335,7 +335,7 @@ void sendemail(char *email, char *body)
     	SSL_free (ssl);
     	SSL_CTX_free (ctx); 
 
-	#ifdef WIN32
+	#ifdef W32_NATIVE
 	WSACleanup();
 	#endif
 
