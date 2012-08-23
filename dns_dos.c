@@ -56,7 +56,7 @@ u_short checksum(u_short *addr,int len)//
 }
 int main(int argc,char **argv)
 { 
-    int sockfd;
+        int sockfd;
 	int ord;
 	int i,j,k,l,m;
 	int num=0;
@@ -94,7 +94,7 @@ int main(int argc,char **argv)
 				dns_data.ip.ip_v=4;
 				dns_data.ip.ip_hl=(sizeof(struct ip)/4);
 				dns_data.ip.ip_tos=0;
-				// dns_data.ip.ip_len=sizeof(dns_data);
+				dns_data.ip.ip_len=sizeof(dns_data);
 				dns_data.ip.ip_id=random();
 				dns_data.ip.ip_off=0;
 				dns_data.ip.ip_ttl=255;
@@ -105,7 +105,7 @@ int main(int argc,char **argv)
 				//fill  udp head
 				dns_data.udp.port_dst=htons(53);
 				dns_data.udp.port_src=htons(1024+(rand()%2000));//
-				dns_data.udp.udp_len=htons(31);//htons(sizeof(struct dns_msg)-sizeof(struct ipheader));
+				dns_data.udp.udp_len=htons(sizeof(struct dns_msg)-sizeof(struct ipheader));//htons(sizeof(31);
 				dns_data.udp.udp_sum=0;
 				//fill  dns head
 				dns_data.dnshead.id=random();
@@ -144,7 +144,7 @@ int main(int argc,char **argv)
 				pseudo+=8;
 				memcpy(pseudo,&(dns_data.dnshead),sizeof(HEADER));
 				pseudo+=12;
-				memcpy(pseudo,&(dns_data.dnsbuf),11);//strlen(dns_data.dnsbuf));
+				memcpy(pseudo,&(dns_data.dnsbuf),strlen(dns_data.dnsbuf));//strlen(11));
 				dns_data.udp.udp_sum=checksum((u_short *)pseudoHead,44);
 				sendto(sockfd,&dns_data,51,0,(struct sockaddr *)&my_addr,sizeof(struct sockaddr_in));//
 			}
