@@ -9,14 +9,21 @@
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
 
+
+/* Define to 1 if the native W32 API should be used. */
+#if (defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__
+#define W32_NATIVE 1
+#endif
 #ifdef W32_NATIVE
 #define WIN32_LEAN_AND_MEAN
+#define _WIN32_WINNT 0x0502
 #include <windows.h>
 #include <winsock2.h>
-
+#include <ws2tcpip.h>
 #pragma comment(lib, "ws2_32.lib")
 #else
-#include <arpa/inet.h>
+
+# include <arpa/inet.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/socket.h>
