@@ -27,7 +27,7 @@ sample dns dos attack
 #include <ws2tcpip.h>
 #pragma comment(lib, "ws2_32.lib")
 #else
-
+#endif
 
 
 struct ipheader					 //ip header
@@ -85,8 +85,6 @@ int main(int argc,char **argv)
         WSADATA W;
         SOCKET sockfd;
         WSAStartup (0x101, &W);
-        #else
-        #ifdef W32_NATIVE
         WSADATA WSAData;
         WSAStartup(MAKEWORD(2, 2), &WSAData);
         #endif
