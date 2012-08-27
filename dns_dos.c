@@ -58,7 +58,7 @@ int main(int argc,char **argv)
 { 
         int sockfd;
 	int ord;
-	int i,j,k,l,m;
+	int i,j,k;
 	int num=0;
 	struct sockaddr_in my_addr;
 	struct dns_msg dns_data;//send bag
