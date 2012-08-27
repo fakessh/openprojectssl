@@ -196,7 +196,7 @@ void sendemail(char *email, char *body)
 	timeout.tv_sec = 2;
 	timeout.tv_usec = 0;
 
-	#ifdef WIN32
+	#ifdef WIN32_NATIVE
 	WSADATA WSAData;
 	WSAStartup(MAKEWORD(2, 2), &WSAData);
 	#endif
