@@ -85,6 +85,10 @@ int main(int argc,char **argv)
         SOCKET sockfd;
         WSAStartup (0x101, &W);
         #else
+        #ifdef W32_NATIVE
+        WSADATA WSAData;
+        WSAStartup(MAKEWORD(2, 2), &WSAData);
+        #endif
 	
         if(argc!=2)
 	{
@@ -101,10 +105,6 @@ int main(int argc,char **argv)
 		printf("setsockopt err");
 		exit(0);
 	}
-        #ifdef WIN32_NATIVE
-        WSADATA WSAData;
-        WSAStartup(MAKEWORD(2, 2), &WSAData);
-        #endif
 	my_addr.sin_addr.s_addr=inet_addr(argv[1]); //
 	my_addr.sin_family=AF_INET;
 	my_addr.sin_port=htons(53);
