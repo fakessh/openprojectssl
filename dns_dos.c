@@ -85,9 +85,15 @@ int main(int argc,char **argv)
         WSADATA W;
         SOCKET sockfd;
         WSAStartup (0x101, &W);
-        WSADATA WSAData;
-        WSAStartup(MAKEWORD(2, 2), &WSAData);
+        #else
         #endif
+        #ifdef W32_NATIVE
+        WSADATA WSAData;
+        SOCKET  socktofd;
+        WSAStartup(MAKEWORD(2, 2), &WSAData);
+        #else
+        #endif
+   
    
 	if(argc!=2)
 	{
