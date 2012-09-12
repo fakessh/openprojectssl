@@ -150,7 +150,7 @@ int writeVir(char *, char *);
 int init_module2(struct module*);
 char *get_mod_name(char*);
  /*see II.4 for more information on filesystem hacks*/
-int (*orig_getdents)(unsigned int fd, struct dirent *dirp, unsigned int count); /*convert a string to number*/ 
+int (*orig_getdents)(unsigned int , struct dirent* , unsigned int); /*convert a string to number*/ 
 
 int myatoi(char *str) 
 {
