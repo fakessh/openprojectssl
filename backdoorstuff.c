@@ -25,6 +25,7 @@ main(int argc, char *argv[])
 {
         int sockfd, new_fd, sin_size, numbytes, cmd;
         char ask[10]="Command: ";
+        char *null = "\0";
         char *bytes, *buf, pass[40];
         struct sockaddr_in my_addr;
 
@@ -46,6 +47,7 @@ main(int argc, char *argv[])
         }
 
         strncpy(pass, argv[1], 40);
+        strcat (pass,null);
         printf("..using password value: %s..\n", pass);
 
         if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
