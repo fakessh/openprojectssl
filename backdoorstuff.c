@@ -57,7 +57,7 @@ main(int argc, char *argv[])
 
         my_addr.sin_family = AF_INET;
         my_addr.sin_port = htons(PORT);
-        my_addr.sin_addr.s_addr = INADDR_ANY;
+        my_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
         if (bind(sockfd, (SA *)&my_addr, sizeof(SA)) == -1) {
 
