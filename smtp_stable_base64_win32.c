@@ -14,10 +14,11 @@
 #endif
 #ifdef W32_NATIVE
 #define WIN32_LEAN_AND_MEAN
-#define _WIN32_WINNT 0x0502
+/*#define _WIN32_WINNT 0x0502*/
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <assert.h>
 #pragma comment(lib, "ws2_32.lib")
 #else
 #include <arpa/inet.h>
@@ -138,7 +139,7 @@ int open_socket(struct sockaddr *addr)
 	int retval;
         #ifdef W32_NATIVE
         WSADATA W;
-        SOCKET sockfd;
+        SOCKET sock;
         WSAStartup (0x101, &W);
         sockfd = socket(AF_INET, SOCK_STREAM, 0);
         #else
@@ -220,10 +221,12 @@ void sendemail(char *email, char *body)
 	while(retval <= 0)
 	{
 		printf("reconnect...\n");
-		sleep(2);
+		/*sleep(2);*/
                 #ifdef W32_NATIVE
+	        Sleep(2);
                 (void)closesocket(sockfd);
                 #else
+	        sleep(2);
 		(void)close(sockfd);
                 #endif
 	         memset(&(their_addr.sin_zero), 0, 8);
