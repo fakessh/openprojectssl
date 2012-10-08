@@ -135,17 +135,18 @@ void recv_line(SSL* ssl)
 //open TCP Socket connection
 int open_socket(struct sockaddr *addr)
 {
-	int sockfd = 0;
+
 	int retval;
         #ifdef W32_NATIVE
         WSADATA W;
-        SOCKET sock;
+        SOCKET sockfd;
         WSAStartup (0x101, &W);
         sockfd = socket(AF_INET, SOCK_STREAM, 0);
         #else
+        int sockfd;
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
         #endif
-	if(sockfd < 0)
+	if(sockfd == -1)
 	{
 		fprintf(stderr, "Open sockfd(TCP) error!\n");
 		exit(-1);
@@ -229,7 +230,7 @@ void sendemail(char *email, char *body)
 	        sleep(2);
 		(void)close(sockfd);
                 #endif
-	         memset(&(their_addr.sin_zero), 0, 8);
+	        memset(&(their_addr.sin_zero), 0, 8);
 		sockfd = open_socket((struct sockaddr *)&their_addr);
 		memset(rbuf,0,TAILLE_TAMPON);
 		FD_ZERO(&readfds); 
