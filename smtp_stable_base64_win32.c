@@ -19,6 +19,8 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <assert.h>
+#define bzero(p, l) memset(p, 0, l)
+#define bcopy(s, t, l) memmove(t, s, l)
 #pragma comment(lib, "ws2_32.lib")
 #else
 #include <arpa/inet.h>
