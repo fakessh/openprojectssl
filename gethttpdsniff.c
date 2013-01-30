@@ -56,7 +56,7 @@ extern int errno;
 #define DEFAULT_WEB_PORT 80
 #define CAPTURE_LENGTH 1024
 #define TIMEOUT 30
-#define INTERFACE "eth0"
+#define INTERFACE "wlan0"
 #define ISBLANK(x)  (((x) == ' ') || ((x) == '\t'))
 #define SPACELEFT(buf, ptr)  (sizeof buf - ((ptr) - buf))
 #define newstr(s) strcpy(malloc(strlen(s) + 1), s)
